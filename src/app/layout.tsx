@@ -28,18 +28,40 @@ export default function RootLayout({
   const env = parseClientEnv();
   const clerkReady = isClerkClientConfigured(env);
 
+  const content = (
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-md"
+      >
+        Skip to main content
+      </a>
+      {children}
+    </>
+  );
+
   return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background text-text-primary antialiased">
         {clerkReady ? (
           <ClerkProvider
-            appearance={{ theme: shadcn }}
             publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+            signInUrl="/login"
+            signUpUrl="/signup"
+            signInFallbackRedirectUrl="/home"
+            signUpFallbackRedirectUrl="/home"
+            appearance={{
+              theme: shadcn,
+              variables: {
+                colorPrimary: "#22C55E",
+                borderRadius: "0.75rem",
+              },
+            }}
           >
-            {children}
+            {content}
           </ClerkProvider>
         ) : (
-          children
+          content
         )}
       </body>
     </html>

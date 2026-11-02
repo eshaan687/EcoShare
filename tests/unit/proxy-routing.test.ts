@@ -3,28 +3,28 @@ import { isProtectedRequestPath } from "@/lib/auth/proxy";
 import { sanitizeRedirectPath } from "@/lib/security/redirect";
 
 describe("Next.js 16 Clerk proxy route protection classification", () => {
-  it("allows public browsing of canonical discovery and approved impact routes", () => {
+  it("allows guest preview browsing of canonical discovery, /home, and prototype shell routes", () => {
     expect(isProtectedRequestPath("/")).toBe(false);
+    expect(isProtectedRequestPath("/home")).toBe(false);
     expect(isProtectedRequestPath("/explore")).toBe(false);
     expect(isProtectedRequestPath("/communities")).toBe(false);
     expect(isProtectedRequestPath("/communities/ocean-cleanups")).toBe(false);
     expect(isProtectedRequestPath("/challenges")).toBe(false);
+    expect(isProtectedRequestPath("/impact")).toBe(false);
+    expect(isProtectedRequestPath("/messages")).toBe(false);
+    expect(isProtectedRequestPath("/notifications")).toBe(false);
+    expect(isProtectedRequestPath("/bookmarks")).toBe(false);
+    expect(isProtectedRequestPath("/settings")).toBe(false);
+    expect(isProtectedRequestPath("/profile")).toBe(false);
     expect(isProtectedRequestPath("/u/alexr")).toBe(false);
     expect(
       isProtectedRequestPath("/impact/123e4567-e89b-12d3-a456-426614174000"),
     ).toBe(false);
   });
 
-  it("requires authentication for private shell and administrative routes", () => {
-    expect(isProtectedRequestPath("/home")).toBe(true);
-    expect(isProtectedRequestPath("/impact")).toBe(true);
+  it("strictly requires authentication for mutation and administrative routes", () => {
     expect(isProtectedRequestPath("/create")).toBe(true);
-    expect(isProtectedRequestPath("/messages")).toBe(true);
-    expect(isProtectedRequestPath("/notifications")).toBe(true);
-    expect(isProtectedRequestPath("/bookmarks")).toBe(true);
-    expect(isProtectedRequestPath("/profile")).toBe(true);
     expect(isProtectedRequestPath("/profile/edit")).toBe(true);
-    expect(isProtectedRequestPath("/settings")).toBe(true);
     expect(isProtectedRequestPath("/admin")).toBe(true);
     expect(isProtectedRequestPath("/admin/submissions")).toBe(true);
   });

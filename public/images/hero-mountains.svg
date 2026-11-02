@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="45%" stop-color="#64748B"/>
+      <stop offset="78%" stop-color="#FDBA74"/>
+      <stop offset="100%" stop-color="#FEF3C7"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.72" cy="0.32" r="0.45">
+      <stop offset="0%" stop-color="#FDE68A" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#FB923C" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FB923C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="farMountain" x1="600" y1="100" x2="600" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="midMountain" x1="600" y1="150" x2="600" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E3A2F"/>
+      <stop offset="100%" stop-color="#0F291E"/>
+    </linearGradient>
+    <linearGradient id="foreForest" x1="600" y1="240" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14532D"/>
+      <stop offset="60%" stop-color="#064E3B"/>
+      <stop offset="100%" stop-color="#022C22"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="600" y1="230" x2="600" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FDE68A" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="500" fill="url(#sky)"/>
+  <rect width="1200" height="500" fill="url(#sunGlow)"/>
+  <circle cx="865" cy="145" r="56" fill="#FEF08A" fill-opacity="0.65"/>
+  <!-- Far Mountain Range -->
+  <path d="M0 310 L140 210 L265 265 L430 135 L590 230 L760 110 L920 205 L1075 130 L1200 200 L1200 500 L0 500 Z" fill="url(#farMountain)" opacity="0.85"/>
+  <!-- Sunlit Ridge Highlights -->
+  <path d="M760 110 L835 155 L790 215 L725 170 Z" fill="#FDBA74" opacity="0.22"/>
+  <path d="M430 135 L505 180 L465 235 L395 190 Z" fill="#FDBA74" opacity="0.18"/>
+  <!-- Mid Mountain Range -->
+  <path d="M0 350 L185 235 L340 310 L535 175 L710 275 L895 165 L1055 255 L1200 185 L1200 500 L0 500 Z" fill="url(#midMountain)"/>
+  <rect y="220" width="1200" height="140" fill="url(#mist)"/>
+  <!-- Foreground Pine & Canopy Silhouette -->
+  <path d="M0 390 Q180 335 390 365 T790 345 T1200 355 L1200 500 L0 500 Z" fill="url(#foreForest)"/>
+  <!-- Decorative Botanical Leaf Overlay (Bottom Right, matching UI Reference) -->
+  <g stroke="#4ADE80" stroke-width="2.5" stroke-opacity="0.55" fill="none">
+    <path d="M980 500 C995 420 1035 355 1105 305"/>
+    <path d="M1035 375 C1015 320 1045 260 1115 240 C1120 305 1085 355 1035 375 Z" fill="#22C55E" fill-opacity="0.15"/>
+    <path d="M1000 420 C950 395 925 345 945 295 C990 320 1010 370 1000 420 Z" fill="#22C55E" fill-opacity="0.12"/>
+  </g>
+</svg>

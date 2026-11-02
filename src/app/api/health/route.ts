@@ -11,7 +11,7 @@ export async function GET() {
   return NextResponse.json(
     {
       status: "ok",
-      milestone: 0,
+      milestone: 1,
       clerkConfigured: isClerkClientConfigured(env),
       supabaseConfigured: isSupabaseClientConfigured(env),
     },

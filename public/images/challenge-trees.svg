@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" fill="none">
+  <defs>
+    <linearGradient id="forestSun" x1="160" y1="0" x2="160" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D9F99D"/>
+      <stop offset="48%" stop-color="#4ADE80"/>
+      <stop offset="100%" stop-color="#14532D"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="320" rx="24" fill="url(#forestSun)"/>
+  <circle cx="95" cy="80" r="55" fill="#FEF08A" fill-opacity="0.45"/>
+  <!-- Rich Soil Mound -->
+  <path d="M20 320 Q160 225 300 320 Z" fill="#451A03"/>
+  <path d="M55 320 Q160 250 265 320 Z" fill="#78350F"/>
+  <!-- Young Sapling Stem & Leaves -->
+  <path d="M160 275 L160 125" stroke="#15803D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M160 175 C115 165 88 128 102 92 C138 100 162 135 160 175 Z" fill="#16A34A" stroke="#BBF7D0" stroke-width="2"/>
+  <path d="M160 155 C205 145 232 108 218 72 C182 80 158 115 160 155 Z" fill="#22C55E" stroke="#DCFCE7" stroke-width="2"/>
+  <path d="M160 125 C145 95 152 62 172 48 C186 68 178 102 160 125 Z" fill="#4ADE80"/>
+</svg>

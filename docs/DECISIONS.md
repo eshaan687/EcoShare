@@ -3,7 +3,7 @@
 ## ADR-001: Runtime & Framework Baseline (Node 24 LTS + Next.js 16 + Tailwind CSS 4)
 - **Date:** 2026-11-01
 - **Status:** Approved
-- **Decision:** Standardize on Node.js `24.22.2` LTS (`>=24.0.0 <25.0.0`), `pnpm@12.16.1`, Next.js `16.4.3`, React `19.3.1`, TypeScript `6.0.3`, Tailwind CSS `4.3.3`, `@supabase/supabase-js@2.118.0`, and `@supabase/ssr@0.12.7`.
+- **Decision:** Standardize on Node.js `24.22.2` LTS (`>=24.0.0 <25.0.0`), `pnpm@12.16.1`, Next.js `16.4.3`, React `19.3.1`, TypeScript `6.0.3`, Tailwind CSS `4.3.3`, `@clerk/nextjs@7.9.23`, and `@supabase/supabase-js@2.118.0`.
 - **Rationale:** Ensures active LTS runtime support, Next.js 16 `src/proxy.ts` request interception compatibility, and zero peer-dependency conflicts with `eslint-config-next@16.4.3`.
 
 ## ADR-002: Tailwind CSS 4 Non-Self-Referencing Token Architecture
@@ -25,9 +25,12 @@
   1. Home feed tabs are standardized as `For You`, `Following`, and `Verified Impact`.
   2. `ECOSHARE_PRD.md §8.2` is authoritative for XP thresholds: Level 4 is `Planet Protector` (`350 XP`) and Level 5 is `Earth Champion` (`700 XP`).
 
-## ADR-005: Three-Layer Security Separation & Hardened XP Approval Function
+## ADR-005: Clerk Authentication + Supabase Third-Party Token Architecture
 - **Date:** 2026-11-01
 - **Status:** Approved
 - **Decision:**
-  1. Separate session cookie refresh (`src/proxy.ts` using `supabase.auth.getClaims()`), server-side authorization (`src/lib/auth/guards.ts` querying `public.user_roles`), and database Row Level Security (RLS).
-  2. Implement XP approval in Milestone 2/5/6 via a hardened PostgreSQL `SECURITY DEFINER` function (`public.approve_impact_submission`) with `SET search_path = pg_catalog, public`, revoked `PUBLIC`/`anon` execution, `FOR UPDATE` row locking, positive XP validation, non-self-approval enforcement, unique submission reward constraint on `points_ledger`, and append-only `audit_logs`.
+  1. **Clerk (`@clerk/nextjs`)** is EcoShare's official authentication provider (Email/Password, Google, Apple), replacing Supabase Auth and `@supabase/ssr`.
+  2. **Request Interception (`src/proxy.ts`):** Uses Clerk's `clerkMiddleware` (`@clerk/nextjs/server`) to protect private routes while keeping public routes accessible.
+  3. **Supabase Integration (`@supabase/supabase-js`):** Browser (`src/lib/supabase/client.ts`) and server (`src/lib/supabase/server.ts`) clients authenticate with Supabase using the official third-party `accessToken` callback option (`accessToken: async () => (await auth()).getToken()` on the server and `session?.getToken()` in the browser).
+  4. **Identity & Authorization Separation:** Server-side guards (`src/lib/auth/guards.ts`) verify the caller's identity via Clerk's `auth()` and verify EcoShare roles (`user`, `moderator`, `verifier`, `admin`) from `public.user_roles` in PostgreSQL.
+  5. **Database RLS & XP Approval Hardening (Milestone 2+):** PostgreSQL RLS policies and `SECURITY DEFINER` functions must identify the caller via `(auth.jwt()->>'sub')` (the Clerk `user_...` ID stored as `text`), never `auth.uid()`.

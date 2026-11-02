@@ -21,7 +21,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.{ts,tsx}\""
   },
   "dependencies": {
-    "@supabase/ssr": "0.12.7",
+    "@clerk/nextjs": "7.9.23",
     "@supabase/supabase-js": "2.118.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -42,7 +42,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "4.7.0",
-    "eslint": "10.14.0",
+    "eslint": "9.39.5",
     "eslint-config-next": "16.4.3",
     "jsdom": "26.1.0",
     "prettier": "3.9.10",

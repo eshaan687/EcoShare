@@ -5,7 +5,8 @@
 **Product:** EcoShare  
 **Platform:** Responsive Web Application  
 **Audience:** Worldwide  
-**Backend:** Supabase  
+**Backend:** Supabase (PostgreSQL, Storage, Realtime)  
+**Authentication:** Clerk (`@clerk/nextjs`)  
 **Frontend:** Next.js + TypeScript
 
 ---
@@ -138,7 +139,7 @@ Support three authentication methods:
 - Google authentication.
 - Apple authentication.
 
-Use Supabase Auth.
+Use Clerk (`@clerk/nextjs`) integrated with Supabase via the official Clerk third-party auth integration.
 
 ## 4.2 Registration
 
@@ -629,11 +630,16 @@ Design privacy controls with international users in mind.
 Supabase will provide:
 
 - PostgreSQL database.
-- Authentication.
 - Storage.
 - Realtime functionality.
-- Database policies.
+- Database policies (RLS integrated with Clerk JWT `sub` claims).
 - Server-side integrations.
+
+Clerk will provide:
+
+- Authentication (Email, Google, Apple).
+- Session management and Next.js request proxy protection.
+- Third-party token integration with Supabase.
 
 ## 16.3 Media
 

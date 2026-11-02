@@ -89,11 +89,11 @@ Use the approved technology stack:
 - Tailwind CSS.
 - shadcn/ui where appropriate.
 - Lucide React.
+- Clerk (`@clerk/nextjs`) for Authentication.
 - Supabase PostgreSQL.
-- Supabase Auth.
 - Supabase Storage.
 - Supabase Realtime.
-- `@supabase/ssr`.
+- `@supabase/supabase-js` (with Clerk third-party `accessToken` integration).
 - Zod.
 - Vitest.
 - Playwright.
@@ -358,13 +358,11 @@ Implement the approved authentication methods:
 2. Google.
 3. Apple.
 
-Use Supabase Auth and `@supabase/ssr`.
+Use Clerk (`@clerk/nextjs`) integrated with Supabase via the official Clerk third-party authentication integration (`accessToken` callback on `@supabase/supabase-js`).
 
-Implement secure cookie-based sessions.
+Implement Clerk's official Next.js request proxy (`clerkMiddleware` in `src/proxy.ts`) and server-side identity verification (`auth()` from `@clerk/nextjs/server`).
 
-Use appropriate server-side identity verification.
-
-Do not use deprecated Supabase Auth Helpers.
+Do not use Supabase Auth, `@supabase/ssr`, or `auth.uid()` for Clerk users; evaluate `(auth.jwt()->>'sub')` in PostgreSQL RLS policies and verify EcoShare roles in `public.user_roles`.
 
 Do not simulate successful authentication.
 

@@ -6,7 +6,7 @@
 **Frontend:** Next.js + TypeScript  
 **Backend:** Supabase  
 **Database:** PostgreSQL  
-**Authentication:** Supabase Auth  
+**Authentication:** Clerk (`@clerk/nextjs`)  
 **Media:** Supabase Storage  
 **Deployment:** Vercel  
 **Repository:** GitHub
@@ -96,7 +96,7 @@ The following stack is approved for the initial implementation.
 | Icons | Lucide React |
 | Backend | Supabase |
 | Database | PostgreSQL |
-| Authentication | Supabase Auth |
+| Authentication | Clerk (`@clerk/nextjs`) |
 | Storage | Supabase Storage |
 | Realtime | Supabase Realtime |
 | Hosting | Vercel |
@@ -259,15 +259,15 @@ Keep server-only logic out of client bundles.
 
 # 4. Supabase Project Architecture
 
-Supabase is the primary backend.
+Supabase is the primary backend for data, storage and realtime.
 
 It provides:
 
 1. PostgreSQL database.
-2. Authentication.
+2. Third-party JWT verification for Clerk session tokens.
 3. Storage.
 4. Realtime functionality.
-5. Row Level Security.
+5. Row Level Security (evaluating `auth.jwt()->>'sub'`).
 6. Database functions.
 
 ## 4.1 Project Environments
@@ -304,7 +304,7 @@ Use CDN delivery and appropriately configured media access to improve global per
 
 # 5. Database Design
 
-Use PostgreSQL with UUID primary keys.
+Use PostgreSQL with UUID primary keys for domain entities and `text` user identifiers matching Clerk user IDs (`user_...` from `auth.jwt()->>'sub'`).
 
 Use foreign keys, indexes, unique constraints and timestamps appropriately.
 
@@ -322,7 +322,7 @@ Purpose: Public-facing user information.
 
 Suggested fields:
 
-- id: UUID, references auth.users.
+- id: text primary key (Clerk user ID from `auth.jwt()->>'sub'`).
 - username: Unique username.
 - display_name.
 - bio.
@@ -850,17 +850,16 @@ Examples:
 
 # 8. Authentication Architecture
 
-Use Supabase Auth.
+Use Clerk (`@clerk/nextjs`) as the official authentication provider, integrated with Supabase via the official Clerk + Supabase native third-party auth integration.
 
-Use `@supabase/ssr` for Next.js cookie-based authentication.
-
-Do not use deprecated Supabase Auth Helpers packages.
+Do not use Supabase Auth or `@supabase/ssr`.
+Do not use `auth.uid()` to identify Clerk users in PostgreSQL RLS policies; use `(auth.jwt()->>'sub')` to evaluate the authenticated Clerk user ID.
 
 ## 8.1 Authentication Providers
 
 ### Email and Password
 
-Implement:
+Implement via Clerk:
 - Registration.
 - Email verification.
 - Login.
@@ -870,13 +869,13 @@ Implement:
 
 ### Google
 
-Configure Google OAuth in Supabase.
+Configure Google OAuth in Clerk.
 
 Use the correct Google Cloud OAuth credentials and redirect configuration.
 
 ### Apple
 
-Configure Sign in with Apple.
+Configure Sign in with Apple in Clerk.
 
 Requirements may include:
 - Apple Developer account.
@@ -891,15 +890,13 @@ Use the official provider configuration.
 
 Do not simulate Apple authentication.
 
-## 8.2 Session Management
+## 8.2 Session Management & Supabase Token Integration
 
-- Use secure cookie-based sessions.
-- Refresh sessions through the supported Supabase SSR pattern.
-- Validate users on the server.
+- Use Clerk's official Next.js request proxy (`clerkMiddleware` in `src/proxy.ts`).
+- Validate users on the server using Clerk's `auth()` helper from `@clerk/nextjs/server`.
+- Pass Clerk session tokens into `@supabase/supabase-js` browser and server clients using the official `accessToken` callback option (`accessToken: async () => (await auth()).getToken()` on the server, and `session?.getToken()` in the browser).
 - Do not rely on client-side session state for authorization.
-- Avoid trusting unverified session claims.
-
-Use `getClaims()` or `getUser()` as appropriate for the installed Supabase SDK and authorization requirements.
+- Verify EcoShare roles (`user`, `moderator`, `verifier`, `admin`) from `public.user_roles` in PostgreSQL on the server for privileged operations.
 
 ## 8.3 Authentication Callbacks
 
@@ -1073,40 +1070,37 @@ Use environment variables.
 Never commit secrets.
 
 Never expose:
-- Supabase service-role key.
+- Clerk secret key (`CLERK_SECRET_KEY`).
+- Supabase service-role key (`SUPABASE_SERVICE_ROLE_KEY`).
 - OAuth client secrets.
 - Apple private keys.
 - Resend API keys.
 - Other privileged credentials.
 
-The service-role key must only exist in trusted server-side environments.
+The Clerk secret key and Supabase service-role key must only exist in trusted server-side environments.
 
 ## 11.2 Environment Variables
 
 Create `.env.example` containing placeholders:
 
 ```env
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup
+
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-
 SUPABASE_SERVICE_ROLE_KEY=
 
-NEXT_PUBLIC_APP_URL=
-
 RESEND_API_KEY=
-
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-
-APPLE_CLIENT_ID=
-APPLE_TEAM_ID=
-APPLE_KEY_ID=
-APPLE_PRIVATE_KEY=
 ```
 
-Use the current Supabase publishable key convention where applicable.
+Use the current Supabase publishable/anon key and Clerk publishable key conventions where applicable.
 
-If OAuth credentials are configured directly in Supabase, do not duplicate them unnecessarily in application environment variables.
+If OAuth credentials are configured directly in Clerk, do not duplicate them unnecessarily in application environment variables.
 
 Never put real credentials in `.env.example`.
 
@@ -1362,7 +1356,7 @@ After domain purchase:
 - Configure DNS.
 - Enable HTTPS.
 - Configure canonical URLs.
-- Update Supabase authentication redirect URLs.
+- Update Clerk authentication redirect and allowed origin URLs.
 - Update Google OAuth redirect settings where required.
 - Configure Apple associated domains where required.
 - Authenticate the email sender domain.

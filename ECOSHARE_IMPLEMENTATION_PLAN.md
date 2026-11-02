@@ -84,10 +84,10 @@ Establish a clean, secure and reproducible development environment.
 - Configure Inter typography.
 - Establish ESLint and formatting rules.
 
-**Backend**
-- Create Supabase development project.
-- Connect the Next.js application.
-- Install and configure Supabase SSR clients.
+**Backend & Authentication**
+- Create Supabase development project and Clerk development application.
+- Connect the Next.js application to Clerk (`@clerk/nextjs`) and Supabase (`@supabase/supabase-js`).
+- Configure Clerk Next.js proxy (`src/proxy.ts`) and Supabase third-party `accessToken` clients.
 - Separate browser and server clients.
 - Configure environment variables.
 

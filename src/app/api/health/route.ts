@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { isSupabaseClientConfigured, parseClientEnv } from "@/lib/env.client";
+import {
+  isClerkClientConfigured,
+  isSupabaseClientConfigured,
+  parseClientEnv,
+} from "@/lib/env.client";
 
 export async function GET() {
   const env = parseClientEnv();
@@ -8,6 +12,7 @@ export async function GET() {
     {
       status: "ok",
       milestone: 0,
+      clerkConfigured: isClerkClientConfigured(env),
       supabaseConfigured: isSupabaseClientConfigured(env),
     },
     {

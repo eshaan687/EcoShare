@@ -1,7 +1,7 @@
 # EcoShare — Development Status
 
 **Last Updated:** 2026-11-01  
-**Current Milestone:** Milestone 0 — Project Foundation (**Completed — Pending Product Owner Review**)
+**Current Milestone:** Milestone 0 — Project Foundation (**Completed — Pending Technical Manager & Product Owner Review**)
 
 ---
 
@@ -31,13 +31,14 @@
 - [x] Initialized Next.js `16.4.3` App Router with React `19.3.1` and strict TypeScript `6.0.3`.
 - [x] Configured Tailwind CSS `4.3.3` (`@tailwindcss/postcss`) with distinct `--ecoshare-*` raw tokens in `:root` mapped cleanly via `@theme inline` in `src/app/globals.css`.
 - [x] Configured `Inter` typography and `shadcn/ui` foundation (`components.json`, `src/lib/utils/cn.ts`, `lucide-react@1.66.0`).
-- [x] Implemented `@supabase/ssr@0.12.7` browser client (`src/lib/supabase/client.ts`), server client (`src/lib/supabase/server.ts`), Next.js 16 request proxy (`src/proxy.ts` + `src/lib/supabase/proxy.ts` using `getClaims()`), server-only admin client (`src/lib/supabase/admin.ts`), and server-side role/auth guards (`src/lib/auth/guards.ts`).
-- [x] Configured Zod `4.6.7` environment validation (`src/lib/env.client.ts`, `src/lib/env.server.ts`) with optional `SUPABASE_SERVICE_ROLE_KEY` for Milestone 0 builds.
-- [x] Configured Vitest `5.0.5` unit tests and Playwright `1.64.1` E2E tests across all 7 approved viewports (`360px` to `1440px`).
+- [x] Updated `ECOSHARE_PRD.md`, `ECOSHARE_ARCHITECTURE.md`, `ECOSHARE_IMPLEMENTATION_PLAN.md`, and `AGENTS.md` to reflect the official **Clerk + Supabase** architecture.
+- [x] Replaced `@supabase/ssr` with `@clerk/nextjs@7.9.23` and `@supabase/supabase-js@2.118.0` using the official third-party `accessToken` callback integration (`src/lib/supabase/client.ts`, `src/lib/supabase/server.ts`), Clerk Next.js proxy (`src/proxy.ts` + `src/lib/auth/proxy.ts`), server-only admin client (`src/lib/supabase/admin.ts`), and Clerk `auth()` + database role guards (`src/lib/auth/guards.ts`).
+- [x] Configured Zod `4.6.7` environment validation (`src/lib/env.client.ts`, `src/lib/env.server.ts`) for Clerk and Supabase environment variables.
+- [x] Configured Vitest `5.0.5` unit tests (including Clerk auth & role guard tests) and Playwright `1.64.1` E2E tests across all 7 approved viewports (`360px` to `1440px`).
 
 ---
 
 ## Pending External Configuration
 
 - **GitHub Remote Repository URL:** Not yet configured (awaiting URL from Product Owner).
-- **Supabase Development Project Credentials (`.env.local`):** Awaiting `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in local `.env.local` for live cloud connectivity in Milestone 2.
+- **Clerk & Supabase Development Credentials (`.env.local`):** Awaiting `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in local `.env.local` for live cloud connectivity in Milestone 2.

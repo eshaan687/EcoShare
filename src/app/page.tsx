@@ -1,10 +1,15 @@
 import { Leaf, ShieldCheck } from "lucide-react";
-import { isSupabaseClientConfigured, parseClientEnv } from "@/lib/env.client";
+import {
+  isClerkClientConfigured,
+  isSupabaseClientConfigured,
+  parseClientEnv,
+} from "@/lib/env.client";
 import { ECOSHARE_FEED_TABS } from "@/lib/constants/design-tokens";
 import { ECOSHARE_LEVELS } from "@/lib/constants/levels";
 
 export default function FoundationPage() {
   const env = parseClientEnv();
+  const clerkReady = isClerkClientConfigured(env);
   const supabaseReady = isSupabaseClientConfigured(env);
 
   return (
@@ -41,8 +46,9 @@ export default function FoundationPage() {
           <p className="max-w-2xl text-base leading-[1.5] text-text-secondary">
             A global community for a cleaner, healthier planet. This screen
             verifies the Milestone 0 engineering foundation (Next.js 16 App
-            Router, Tailwind CSS 4 design tokens, Inter typography, and
-            Supabase SSR architecture) prior to Milestone 1 UI implementation.
+            Router, Tailwind CSS 4 design tokens, Inter typography, Clerk
+            authentication, and Supabase third-party token integration) prior to
+            Milestone 1 UI implementation.
           </p>
         </section>
 
@@ -52,12 +58,12 @@ export default function FoundationPage() {
         >
           <div className="rounded-control border border-border bg-background p-4">
             <h2 className="text-base font-semibold text-text-primary">
-              Supabase SSR Connection
+              Clerk + Supabase Integration
             </h2>
             <p className="mt-1 text-sm text-text-secondary">
-              {supabaseReady
-                ? "Configured via environment variables."
-                : "Awaiting NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local."}
+              {clerkReady && supabaseReady
+                ? "Clerk authentication and Supabase client configured."
+                : "Awaiting Clerk and Supabase development keys in .env.local."}
             </p>
           </div>
 

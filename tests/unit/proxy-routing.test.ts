@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { isProtectedRequestPath } from "@/lib/auth/proxy";
 import { sanitizeRedirectPath } from "@/lib/security/redirect";
-import { isProtectedRequestPath } from "@/lib/supabase/proxy";
 
-describe("Next.js 16 proxy route protection classification", () => {
+describe("Next.js 16 Clerk proxy route protection classification", () => {
   it("allows public browsing of canonical discovery and approved impact routes", () => {
     expect(isProtectedRequestPath("/")).toBe(false);
     expect(isProtectedRequestPath("/explore")).toBe(false);
@@ -10,9 +10,9 @@ describe("Next.js 16 proxy route protection classification", () => {
     expect(isProtectedRequestPath("/communities/ocean-cleanups")).toBe(false);
     expect(isProtectedRequestPath("/challenges")).toBe(false);
     expect(isProtectedRequestPath("/u/alexr")).toBe(false);
-    expect(isProtectedRequestPath("/impact/123e4567-e89b-12d3-a456-426614174000")).toBe(
-      false,
-    );
+    expect(
+      isProtectedRequestPath("/impact/123e4567-e89b-12d3-a456-426614174000"),
+    ).toBe(false);
   });
 
   it("requires authentication for private shell and administrative routes", () => {

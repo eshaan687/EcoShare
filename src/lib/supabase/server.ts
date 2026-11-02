@@ -1,9 +1,16 @@
-import { createServerClient } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import "server-only";
+import { auth } from "@clerk/nextjs/server";
+import {
+  createClient as createSupabaseClient,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 import { isSupabaseClientConfigured, parseClientEnv } from "@/lib/env.client";
 import type { Database } from "@/types/database.types";
 
+/**
+ * Creates a server-side Supabase client authenticated with the caller's Clerk
+ * session token via the official third-party `accessToken` callback integration.
+ */
 export async function createClient(): Promise<SupabaseClient<Database>> {
   const env = parseClientEnv();
 
@@ -13,26 +20,13 @@ export async function createClient(): Promise<SupabaseClient<Database>> {
     );
   }
 
-  const cookieStore = await cookies();
-
-  return createServerClient<Database>(
+  return createSupabaseClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
-          } catch {
-            // setAll is called from a Server Component where mutating cookies is not allowed.
-            // Session refresh cookies are handled by src/proxy.ts.
-          }
-        },
+      async accessToken() {
+        const clerkAuth = await auth();
+        return clerkAuth.getToken();
       },
     },
   );

@@ -1,55 +1,58 @@
 import "server-only";
+import { auth } from "@clerk/nextjs/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import type { EcoShareRole } from "@/types/database.types";
+import type { Database, EcoShareRole } from "@/types/database.types";
 
 export { sanitizeRedirectPath } from "@/lib/security/redirect";
 
 export interface AuthenticatedActor {
   readonly userId: string;
-  readonly email: string | undefined;
+  readonly sessionId: string | null;
 }
 
+export type ClerkServerAuthResolver = () => Promise<{
+  userId: string | null;
+  sessionId: string | null;
+}>;
+
+export type SupabaseServerClientFactory = () => Promise<
+  Pick<SupabaseClient<Database>, "from">
+>;
+
 /**
- * Verifies the active user session on the server.
- * Uses getUser() when fresh Auth server verification is required, or getClaims() for verified JWT claims.
+ * Verifies the active Clerk user session on the server via @clerk/nextjs/server `auth()`.
+ * Never trusts client-supplied user IDs.
  */
-export async function requireAuthenticatedUser(options?: {
-  verifyWithAuthServer?: boolean;
-}): Promise<AuthenticatedActor> {
-  const supabase = await createClient();
+export async function requireAuthenticatedUser(
+  resolveAuth: ClerkServerAuthResolver = () => auth(),
+): Promise<AuthenticatedActor> {
+  const { userId, sessionId } = await resolveAuth();
 
-  if (options?.verifyWithAuthServer) {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) {
-      throw new Error("Authentication required");
-    }
-    return {
-      userId: data.user.id,
-      email: data.user.email,
-    };
-  }
-
-  const { data, error } = await supabase.auth.getClaims();
-  const claims = data?.claims;
-  if (error || !claims || typeof claims.sub !== "string") {
+  if (!userId) {
     throw new Error("Authentication required");
   }
 
   return {
-    userId: claims.sub,
-    email: typeof claims.email === "string" ? claims.email : undefined,
+    userId,
+    sessionId,
   };
 }
 
 /**
- * Queries public.user_roles directly on the server for every privileged operation.
- * Never trusts client-supplied roles or unverified metadata.
+ * Verifies the caller's Clerk session and queries `public.user_roles` directly from
+ * PostgreSQL on the server for every privileged operation.
+ * Never trusts client-supplied roles or cached metadata.
  */
 export async function requireAuthorizedRole(
   allowedRoles: readonly EcoShareRole[],
+  dependencies: {
+    resolveAuth?: ClerkServerAuthResolver;
+    getSupabaseClient?: SupabaseServerClientFactory;
+  } = {},
 ): Promise<AuthenticatedActor & { readonly roles: readonly EcoShareRole[] }> {
-  const actor = await requireAuthenticatedUser({ verifyWithAuthServer: true });
-  const supabase = await createClient();
+  const actor = await requireAuthenticatedUser(dependencies.resolveAuth);
+  const supabase = await (dependencies.getSupabaseClient ?? createClient)();
 
   const { data: roleRows, error } = await supabase
     .from("user_roles")
@@ -74,4 +77,3 @@ export async function requireAuthorizedRole(
     roles: assignedRoles,
   };
 }
-

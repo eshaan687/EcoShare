@@ -34,5 +34,16 @@ test.describe("Milestone 0 Foundation Verification", () => {
     const body = await response.json();
     expect(body.status).toBe("ok");
     expect(body.milestone).toBe(0);
+    expect(typeof body.clerkConfigured).toBe("boolean");
+    expect(typeof body.supabaseConfigured).toBe("boolean");
+  });
+
+  test("protects private routes via proxy by redirecting unauthenticated requests to /login", async ({
+    request,
+  }) => {
+    const response = await request.get("/admin", { maxRedirects: 0 });
+    expect(response.status()).toBeGreaterThanOrEqual(300);
+    expect(response.status()).toBeLessThan(400);
+    expect(response.headers()["location"]).toContain("/login?next=%2Fadmin");
   });
 });

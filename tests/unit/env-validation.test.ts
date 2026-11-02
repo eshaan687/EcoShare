@@ -1,25 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { isSupabaseClientConfigured, parseClientEnv } from "@/lib/env.client";
+import {
+  isClerkClientConfigured,
+  isSupabaseClientConfigured,
+  parseClientEnv,
+} from "@/lib/env.client";
 
-describe("EcoShare environment validation", () => {
-  it("defaults NEXT_PUBLIC_APP_URL and treats Supabase as unconfigured when keys are blank", () => {
+describe("EcoShare Clerk + Supabase environment validation", () => {
+  it("defaults URLs and treats Clerk and Supabase as unconfigured when keys are blank", () => {
     const env = parseClientEnv({
       NEXT_PUBLIC_APP_URL: "",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "",
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: "",
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: "",
       NEXT_PUBLIC_SUPABASE_URL: "",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
     });
 
     expect(env.NEXT_PUBLIC_APP_URL).toBe("http://localhost:3000");
+    expect(env.NEXT_PUBLIC_CLERK_SIGN_IN_URL).toBe("/login");
+    expect(env.NEXT_PUBLIC_CLERK_SIGN_UP_URL).toBe("/signup");
+    expect(isClerkClientConfigured(env)).toBe(false);
     expect(isSupabaseClientConfigured(env)).toBe(false);
   });
 
-  it("validates configured Supabase URL and anon key", () => {
+  it("validates configured Clerk publishable key and Supabase URL + anon key", () => {
     const env = parseClientEnv({
       NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_example_placeholder",
       NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "public-anon-key-placeholder",
     });
 
+    expect(isClerkClientConfigured(env)).toBe(true);
     expect(isSupabaseClientConfigured(env)).toBe(true);
   });
 

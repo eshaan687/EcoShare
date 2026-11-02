@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { shadcn } from "@clerk/ui/themes";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { isClerkClientConfigured, parseClientEnv } from "@/lib/env.client";
@@ -27,25 +28,20 @@ export default function RootLayout({
   const env = parseClientEnv();
   const clerkReady = isClerkClientConfigured(env);
 
-  const documentTree = (
+  return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background text-text-primary antialiased">
-        {children}
+        {clerkReady ? (
+          <ClerkProvider
+            appearance={{ theme: shadcn }}
+            publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+          >
+            {children}
+          </ClerkProvider>
+        ) : (
+          children
+        )}
       </body>
     </html>
-  );
-
-  if (!clerkReady) {
-    return documentTree;
-  }
-
-  return (
-    <ClerkProvider
-      publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      signInUrl={env.NEXT_PUBLIC_CLERK_SIGN_IN_URL}
-      signUpUrl={env.NEXT_PUBLIC_CLERK_SIGN_UP_URL}
-    >
-      {documentTree}
-    </ClerkProvider>
   );
 }

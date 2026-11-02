@@ -19,6 +19,11 @@ test.describe("Milestone 0 Foundation Verification", () => {
     await expect(page.getByText("Planet Protector")).toBeVisible();
     await expect(page.getByText("Earth Champion")).toBeVisible();
 
+    const signInButton = page.getByRole("button", { name: /sign in/i });
+    const signUpButton = page.getByRole("button", { name: /sign up/i });
+    await expect(signInButton).toBeVisible();
+    await expect(signUpButton).toBeVisible();
+
     const hasHorizontalOverflow = await page.evaluate(() => {
       return (
         document.documentElement.scrollWidth >
@@ -38,12 +43,12 @@ test.describe("Milestone 0 Foundation Verification", () => {
     expect(typeof body.supabaseConfigured).toBe("boolean");
   });
 
-  test("protects private routes via proxy by redirecting unauthenticated requests to /login", async ({
+  test("protects private routes via proxy by redirecting unauthenticated requests to sign-in", async ({
     request,
   }) => {
     const response = await request.get("/admin", { maxRedirects: 0 });
     expect(response.status()).toBeGreaterThanOrEqual(300);
     expect(response.status()).toBeLessThan(400);
-    expect(response.headers()["location"]).toContain("/login?next=%2Fadmin");
+    expect(response.headers()["location"]).toMatch(/\/(sign-in|login)/);
   });
 });

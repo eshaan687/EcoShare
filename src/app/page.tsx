@@ -1,4 +1,6 @@
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import { Leaf, ShieldCheck } from "lucide-react";
+import { Suspense } from "react";
 import {
   isClerkClientConfigured,
   isSupabaseClientConfigured,
@@ -33,10 +35,24 @@ export default function FoundationPage() {
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 rounded-pill bg-secondary/50 px-3 py-1 text-xs font-semibold text-primary-dark">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            Foundation Active
-          </span>
+          <div className="flex items-center gap-3">
+            {clerkReady ? (
+              <Suspense fallback={null}>
+                <Show when="signed-out">
+                  <SignInButton />
+                  <SignUpButton />
+                </Show>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
+              </Suspense>
+            ) : null}
+
+            <span className="inline-flex items-center gap-1.5 rounded-pill bg-secondary/50 px-3 py-1 text-xs font-semibold text-primary-dark">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              Foundation Active
+            </span>
+          </div>
         </div>
 
         <section className="mt-6 space-y-3">

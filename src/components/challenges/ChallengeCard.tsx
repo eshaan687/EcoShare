@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Sparkles, Users } from "lucide-react";
+import { Calendar, ChevronRight, Sparkles, Users } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -18,7 +18,8 @@ export interface ChallengeCardProps {
 
 /**
  * Supports both the compact "Ongoing Challenges" right-sidebar item from
- * references/ecoshare-ui-reference.png and the full challenge discovery card
+ * references/ecoshare-ui-reference.png (with photo thumbnail, description,
+ * participant count, and chevron) and the full challenge discovery card
  * on /challenges and /explore.
  */
 export function ChallengeCard({
@@ -32,45 +33,58 @@ export function ChallengeCard({
     return (
       <div
         className={cn(
-          "flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5 transition-colors hover:border-primary/40",
+          "flex items-center gap-3.5 rounded-2xl border border-border/80 bg-surface p-3 transition-colors hover:border-primary/40",
           className,
         )}
       >
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border/60">
           <Image
             src={challenge.thumbnailSrc}
             alt={challenge.title}
             fill
-            sizes="56px"
+            sizes="64px"
             className="object-cover"
           />
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold text-foreground truncate">{challenge.title}</p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">
+          <p className="text-sm font-bold text-foreground truncate">{challenge.title}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2 leading-snug">
             {challenge.description}
           </p>
+          <div className="mt-1.5 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-medium text-muted-foreground">
+              {(challenge.participantsCount + (joinedPreview ? 1 : 0)).toLocaleString()}{" "}
+              participants
+            </span>
+            <button
+              type="button"
+              onClick={() => setJoinedPreview((prev) => !prev)}
+              aria-pressed={joinedPreview}
+              aria-label={
+                joinedPreview
+                  ? `Leave ${challenge.title} preview`
+                  : `Join ${challenge.title} preview`
+              }
+              className={cn(
+                "inline-flex items-center gap-0.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-md px-1.5 py-0.5",
+                joinedPreview
+                  ? "bg-secondary/60 text-primary-dark"
+                  : "text-primary-dark hover:bg-secondary/35",
+              )}
+            >
+              <span>{joinedPreview ? "Joined" : "Join"}</span>
+              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
-
-        <Button
-          type="button"
-          size="sm"
-          variant={joinedPreview ? "secondary" : "primary"}
-          pill
-          onClick={() => setJoinedPreview((prev) => !prev)}
-          aria-pressed={joinedPreview}
-          className="shrink-0"
-        >
-          {joinedPreview ? "Joined (Preview)" : "Join"}
-        </Button>
       </div>
     );
   }
 
   return (
-    <Card className={cn("overflow-hidden flex flex-col", className)}>
-      <div className="relative h-40 w-full overflow-hidden border-b border-border">
+    <Card className={cn("overflow-hidden flex flex-col shadow-xs", className)}>
+      <div className="relative h-44 w-full overflow-hidden border-b border-border">
         <Image
           src={challenge.thumbnailSrc}
           alt={challenge.title}

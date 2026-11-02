@@ -1,14 +1,14 @@
 "use client";
 
-import { Calendar, CheckCircle2, MapPin, UserCheck, UserPlus } from "lucide-react";
+import { Calendar, Leaf, MapPin, UserCheck, UserPlus } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 import { VerificationBadge } from "@/components/impact/VerificationBadge";
 import { Avatar } from "@/components/ui/Avatar";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { calculateLevelProgress } from "@/lib/constants/levels";
 import type { PrototypeProfileSummary } from "@/lib/mock/prototype-data";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +19,9 @@ export interface ProfileHeaderProps {
 }
 
 /**
- * Matches the "User Profile & Badges" header card in references/ecoshare-ui-reference.png:
- * mountain nature cover banner, overlapping avatar, "Alex R. ✓", "Verified Contributor",
- * bio, location, and Follow/Edit Profile action.
+ * Matches the "User Profile" header card in references/ecoshare-ui-reference.png:
+ * mountain nature cover banner, overlapping photographic avatar, "Alex R. ✓", "@alexr",
+ * "Level 4 · Planet Protector", bio, location, and Edit Profile / Follow action.
  */
 export function ProfileHeader({
   profile,
@@ -29,11 +29,12 @@ export function ProfileHeader({
   className,
 }: ProfileHeaderProps) {
   const [followingPreview, setFollowingPreview] = useState(false);
+  const progress = calculateLevelProgress(profile.totalXp);
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden shadow-xs", className)}>
       {/* Nature Cover Banner */}
-      <div className="relative h-36 w-full overflow-hidden border-b border-border sm:h-44">
+      <div className="relative h-40 w-full overflow-hidden border-b border-border sm:h-48">
         <Image
           src={profile.coverSrc}
           alt={`${profile.displayName} cover banner`}
@@ -42,32 +43,25 @@ export function ProfileHeader({
           className="object-cover"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent"
           aria-hidden="true"
         />
-        <div className="absolute right-3 top-3">
-          <Badge variant="prototype">Sample Profile</Badge>
-        </div>
       </div>
 
       {/* Profile Identity Content */}
-      <div className="px-5 pb-5">
-        <div className="relative -mt-10 mb-3 flex flex-wrap items-end justify-between gap-3">
+      <div className="px-6 pb-5">
+        <div className="relative -mt-11 mb-3 flex flex-wrap items-end justify-between gap-3">
           <Avatar
-            initials={profile.displayName
-              .split(" ")
-              .map((part) => part[0])
-              .join("")
-              .slice(0, 2)}
+            src={profile.avatarSrc}
             alt={profile.displayName}
             size="xl"
-            className="h-20 w-20 border-4 border-surface shadow-sm text-lg"
+            className="h-22 w-22 border-4 border-surface shadow-sm"
           />
 
           <div className="flex items-center gap-2 pt-2">
             {isOwnProfile ? (
               <Button type="button" variant="secondary" size="sm" pill>
-                Preview Profile Settings
+                Edit Profile
               </Button>
             ) : (
               <Button
@@ -98,18 +92,20 @@ export function ProfileHeader({
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl font-bold text-foreground">{profile.displayName}</h1>
             {profile.isVerifiedContributor ? (
-              <CheckCircle2
-                className="h-5 w-5 text-primary"
-                aria-label="Verified Contributor"
-              />
-            ) : null}
-            <span className="text-sm text-muted-foreground">@{profile.username}</span>
-            {profile.isVerifiedContributor ? (
-              <VerificationBadge status="verified" label="Verified Contributor" />
+              <VerificationBadge variant="author" />
             ) : null}
           </div>
 
-          <p className="text-sm text-foreground leading-relaxed">{profile.bio}</p>
+          <p className="text-sm text-muted-foreground">@{profile.username}</p>
+
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-dark pt-0.5">
+            <Leaf className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+            <span>
+              Level {progress.currentLevel.level} · {progress.currentLevel.name}
+            </span>
+          </p>
+
+          <p className="pt-1 text-sm text-foreground leading-relaxed">{profile.bio}</p>
 
           <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">

@@ -9,13 +9,15 @@ import { isClerkServerConfigured, parseServerEnv } from "@/lib/env.server";
 
 /**
  * Official Clerk Next.js 16 request proxy (`clerkMiddleware`).
- * NOTE: Proxy is NOT the sole authorization boundary. Protected pages, Server Actions,
- * and PostgreSQL RLS enforce independent server-side (`auth()` + `user_roles`) and
- * database-level (`auth.jwt()->>'sub'`) checks.
+ * Explicitly redirects unauthenticated requests on protected routes to `/login`.
  */
 const configuredClerkProxy = clerkMiddleware(async (auth, request) => {
   if (isProtectedRequestPath(request.nextUrl.pathname)) {
-    await auth.protect();
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect_url", request.nextUrl.pathname);
+    await auth.protect({
+      unauthenticatedUrl: loginUrl.toString(),
+    });
   }
 });
 
@@ -29,7 +31,7 @@ export async function proxy(
     if (isProtectedRequestPath(request.nextUrl.pathname)) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = env.NEXT_PUBLIC_CLERK_SIGN_IN_URL;
-      loginUrl.searchParams.set("next", request.nextUrl.pathname);
+      loginUrl.searchParams.set("redirect_url", request.nextUrl.pathname);
 
       const redirectResponse = NextResponse.redirect(loginUrl);
       redirectResponse.headers.set(
@@ -44,6 +46,8 @@ export async function proxy(
 
   return configuredClerkProxy(request, event);
 }
+
+export default proxy;
 
 export const config = {
   matcher: [

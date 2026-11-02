@@ -1,5 +1,6 @@
 "use client";
 
+import { Camera } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -14,7 +15,9 @@ export interface HeroBannerProps {
 
 /**
  * Matches the central hero banner in references/ecoshare-ui-reference.png:
- * "Share Actions. Inspire Change." with "Share Your Action" and "Explore Challenges" CTAs.
+ * Photorealistic mountain sunrise background, "Share Actions. Inspire Change.",
+ * "Share Your Action" with camera icon, "Explore Challenges" outline button,
+ * and subtle decorative leaf line-art in the bottom-right corner.
  */
 export function HeroBanner({ className }: HeroBannerProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -24,30 +27,60 @@ export function HeroBanner({ className }: HeroBannerProps) {
       <section
         aria-label="EcoShare Hero Banner"
         className={cn(
-          "relative overflow-hidden rounded-[20px] border border-border bg-primary-dark text-white shadow-xs",
+          "relative overflow-hidden rounded-[20px] border border-border/80 bg-[#0F291E] text-white shadow-sm",
           className,
         )}
       >
         <Image
-          src="/images/hero-mountains.svg"
+          src="/images/hero-mountains.png"
           alt="Sunlight over lush green mountains and river valley"
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 720px"
-          className="object-cover"
+          className="object-cover object-center"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-r from-[#064E3B]/90 via-[#065F46]/75 to-[#15803D]/40"
+          className="absolute inset-0 bg-gradient-to-r from-[#051F14]/80 via-[#0A2E1F]/50 to-transparent"
           aria-hidden="true"
         />
 
-        <div className="relative z-10 p-6 sm:p-7">
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-[28px] leading-tight">
-            Share Actions. Inspire Change.
+        {/* Decorative botanical leaf line-art in bottom right matching reference image */}
+        <svg
+          viewBox="0 0 180 140"
+          fill="none"
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-3 right-2 h-32 w-40 opacity-75 sm:h-36 sm:w-44"
+        >
+          <path
+            d="M88 138V58C88 58 92 22 134 14C138 52 114 82 88 86"
+            stroke="#4ADE80"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M88 98C66 92 42 68 46 34C78 40 88 70 88 98Z"
+            stroke="#4ADE80"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M88 84L118 42M88 96L62 56"
+            stroke="#4ADE80"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+
+        <div className="relative z-10 p-6 sm:px-8 sm:py-7">
+          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-[34px] sm:leading-[1.12]">
+            Share Actions.
+            <br />
+            Inspire Change.
           </h1>
-          <p className="mt-2 max-w-xl text-xs leading-relaxed text-emerald-50/95 sm:text-sm">
-            Join our community dedicated to making a positive impact on the planet. Share your
-            eco-friendly actions, take on challenges, and connect with like-minded individuals!
+          <p className="mt-2.5 max-w-md text-xs leading-relaxed text-white/90 sm:text-sm">
+            A global community for a cleaner, healthier planet.
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -56,14 +89,15 @@ export function HeroBanner({ className }: HeroBannerProps) {
               variant="primary"
               pill
               onClick={() => setDialogOpen(true)}
-              className="shadow-sm"
+              className="shadow-sm px-5 font-semibold"
             >
+              <Camera className="h-4 w-4" aria-hidden="true" />
               Share Your Action
             </Button>
 
             <Link
               href="/challenges"
-              className="inline-flex h-10 items-center justify-center rounded-full border border-white/80 bg-white/15 px-4 text-sm font-semibold text-white backdrop-blur-xs transition-colors hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex h-10 items-center justify-center rounded-full border border-white/85 bg-black/25 px-5 text-sm font-semibold text-white backdrop-blur-xs transition-colors hover:bg-white/20 outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               Explore Challenges
             </Link>

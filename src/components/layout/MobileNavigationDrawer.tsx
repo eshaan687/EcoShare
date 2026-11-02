@@ -65,7 +65,7 @@ export function MobileNavigationDrawer({
               type="button"
               onClick={onClose}
               aria-label="Close navigation menu"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -83,31 +83,24 @@ export function MobileNavigationDrawer({
                   onClick={onClose}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
+                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                     active
-                      ? "bg-primary text-white"
-                      : "text-foreground hover:bg-secondary/35",
+                      ? "bg-secondary/65 font-semibold text-foreground"
+                      : "font-medium text-foreground/85 hover:bg-background hover:text-foreground",
                   )}
                 >
                   <span className="flex items-center gap-3">
                     <Icon
                       className={cn(
-                        "h-4 w-4",
-                        active ? "text-white" : "text-primary-dark",
+                        "h-[18px] w-[18px]",
+                        active ? "text-primary-dark" : "text-muted-foreground",
                       )}
                       aria-hidden={true}
                     />
                     <span>{item.label}</span>
                   </span>
                   {item.badgeCount ? (
-                    <span
-                      className={cn(
-                        "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold",
-                        active
-                          ? "bg-white text-primary-dark"
-                          : "bg-primary text-white",
-                      )}
-                    >
+                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-white">
                       {item.badgeCount}
                     </span>
                   ) : null}
@@ -121,14 +114,14 @@ export function MobileNavigationDrawer({
           <Link
             href="/login"
             onClick={onClose}
-            className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-background text-xs font-semibold text-foreground"
+            className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-background text-xs font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             Log In
           </Link>
           <Link
             href="/signup"
             onClick={onClose}
-            className="inline-flex h-9 items-center justify-center rounded-xl bg-primary text-xs font-semibold text-white"
+            className="inline-flex h-9 items-center justify-center rounded-xl bg-primary text-xs font-semibold text-white outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             Create Account
           </Link>

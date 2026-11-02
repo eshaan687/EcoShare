@@ -11,7 +11,8 @@ export interface PostMediaProps {
 
 /**
  * Renders 1-photo or 2-photo side-by-side post media grid matching Sofia M.'s post
- * in references/ecoshare-ui-reference.png, including the "Verified Impact" overlay pill.
+ * in references/ecoshare-ui-reference.png, including the "Verified Impact" overlay pill
+ * anchored at the bottom-right corner of the verified action photo.
  */
 export function PostMedia({ media, className }: PostMediaProps) {
   if (media.length === 0) {
@@ -29,7 +30,7 @@ export function PostMedia({ media, className }: PostMediaProps) {
       {media.map((item) => (
         <div
           key={item.id}
-          className="relative h-52 w-full overflow-hidden rounded-xl border border-border bg-background sm:h-56"
+          className="relative h-52 w-full overflow-hidden rounded-xl border border-border/70 bg-background sm:h-52"
         >
           <Image
             src={item.src}
@@ -39,7 +40,7 @@ export function PostMedia({ media, className }: PostMediaProps) {
             className="object-cover"
           />
           {item.hasVerifiedImpactBadge ? (
-            <div className="absolute right-2.5 top-2.5">
+            <div className="absolute bottom-2.5 right-2.5">
               <VerificationBadge status="verified" overlay />
             </div>
           ) : null}

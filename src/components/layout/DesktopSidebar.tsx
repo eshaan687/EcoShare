@@ -1,14 +1,14 @@
 "use client";
 
 import {
+  BarChart3,
   Bell,
   Bookmark,
-  Compass,
   Home,
   Leaf,
   MessageSquare,
+  Search,
   Settings,
-  ShieldCheck,
   Trophy,
   Users,
 } from "lucide-react";
@@ -27,10 +27,10 @@ export interface NavItemDefinition {
 
 export const PRIMARY_NAV_ITEMS: readonly NavItemDefinition[] = [
   { href: "/home", label: "Home", icon: Home },
-  { href: "/explore", label: "Explore", icon: Compass },
+  { href: "/explore", label: "Explore", icon: Search },
   { href: "/communities", label: "Communities", icon: Users },
   { href: "/challenges", label: "Challenges", icon: Trophy },
-  { href: "/impact", label: "My Impact", icon: ShieldCheck },
+  { href: "/impact", label: "My Impact", icon: BarChart3 },
 ] as const;
 
 export const SECONDARY_NAV_ITEMS: readonly NavItemDefinition[] = [
@@ -46,8 +46,9 @@ export interface DesktopSidebarProps {
 
 /**
  * Matches the left navigation column in references/ecoshare-ui-reference.png:
- * EcoShare logo, primary & secondary navigation groups, Notifications badge,
- * and the bottom green challenge callout card.
+ * - Soft mint-green active state (`bg-secondary/65 text-foreground`) with green icon
+ *   and no unintended browser focus ring.
+ * - Deep forest-green promotional challenge card at the bottom with white pill CTA.
  */
 export function DesktopSidebar({ className }: DesktopSidebarProps) {
   const pathname = usePathname();
@@ -60,12 +61,12 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
     <aside
       aria-label="Primary sidebar navigation"
       className={cn(
-        "hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col justify-between rounded-[20px] border border-border bg-surface p-4 shadow-xs h-fit sticky top-4",
+        "hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col justify-between rounded-[20px] border border-border/80 bg-surface p-4 shadow-xs h-fit sticky top-4",
         className,
       )}
     >
       <div>
-        <div className="px-2 pb-4 pt-1">
+        <div className="px-2.5 pb-5 pt-1">
           <EcoShareLogo size="md" />
         </div>
 
@@ -79,16 +80,16 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                   active
-                    ? "bg-primary text-white shadow-xs"
-                    : "text-foreground hover:bg-secondary/35 hover:text-primary-dark",
+                    ? "bg-secondary/65 font-semibold text-foreground"
+                    : "font-medium text-foreground/85 hover:bg-background hover:text-foreground",
                 )}
               >
                 <Icon
                   className={cn(
-                    "h-4 w-4 shrink-0",
-                    active ? "text-white" : "text-primary-dark",
+                    "h-[18px] w-[18px] shrink-0",
+                    active ? "text-primary-dark" : "text-muted-foreground",
                   )}
                   aria-hidden={true}
                 />
@@ -98,7 +99,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
           })}
         </nav>
 
-        <div className="my-3 border-t border-border" role="separator" />
+        <div className="my-3.5 border-t border-border/80" role="separator" />
 
         <nav aria-label="Account and activity navigation" className="space-y-1">
           {SECONDARY_NAV_ITEMS.map((item) => {
@@ -110,17 +111,17 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                   active
-                    ? "bg-primary text-white font-semibold shadow-xs"
-                    : "text-muted-foreground hover:bg-secondary/30 hover:text-foreground",
+                    ? "bg-secondary/65 font-semibold text-foreground"
+                    : "font-medium text-foreground/85 hover:bg-background hover:text-foreground",
                 )}
               >
                 <span className="flex items-center gap-3">
                   <Icon
                     className={cn(
-                      "h-4 w-4 shrink-0",
-                      active ? "text-white" : "text-muted-foreground",
+                      "h-[18px] w-[18px] shrink-0",
+                      active ? "text-primary-dark" : "text-muted-foreground",
                     )}
                     aria-hidden={true}
                   />
@@ -130,12 +131,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                 {item.badgeCount ? (
                   <span
                     aria-label={`${item.badgeCount} sample notifications`}
-                    className={cn(
-                      "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold",
-                      active
-                        ? "bg-white text-primary-dark"
-                        : "bg-primary text-white",
-                    )}
+                    className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-white"
                   >
                     {item.badgeCount}
                   </span>
@@ -147,16 +143,20 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
       </div>
 
       {/* Bottom Promotional Challenge Callout matching reference image */}
-      <div className="mt-6 rounded-2xl border border-secondary bg-gradient-to-br from-secondary/50 via-secondary/25 to-surface p-4">
-        <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
-          <Leaf className="h-4 w-4" aria-hidden="true" />
-        </div>
-        <p className="text-xs font-semibold leading-snug text-foreground">
-          Make a bigger impact! Join a global challenge today.
+      <div className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#15803D] via-[#166534] to-[#14532D] p-4 text-white shadow-xs">
+        <Leaf
+          className="pointer-events-none absolute -right-2 -top-2 h-16 w-16 rotate-12 text-white/15"
+          aria-hidden="true"
+        />
+        <p className="relative z-10 text-sm font-bold leading-snug text-white">
+          Make a bigger impact!
+        </p>
+        <p className="relative z-10 mt-1 text-xs leading-relaxed text-emerald-50/90">
+          Join a global challenge today.
         </p>
         <Link
           href="/challenges"
-          className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-dark"
+          className="relative z-10 mt-3.5 inline-flex w-full items-center justify-center rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-[#15803D] shadow-2xs transition-colors hover:bg-emerald-50 outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
           View Challenges &rarr;
         </Link>

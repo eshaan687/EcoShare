@@ -182,7 +182,7 @@ export default function WelcomeOnboardingPage() {
 
               <div className="relative h-56 w-full overflow-hidden">
                 <Image
-                  src="/images/hero-mountains.svg"
+                  src="/images/hero-mountains.png"
                   alt="Mountain valley sunrise with evergreen forest and river"
                   fill
                   priority

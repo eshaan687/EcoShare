@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2 } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 import {
   ECOSHARE_FEED_TABS,
@@ -16,7 +16,7 @@ export interface FeedTabsProps {
 
 /**
  * Matches the feed tab bar in references/ecoshare-ui-reference.png:
- * "For You", "Following", and "Verified Impact" (with green checkmark icon).
+ * "For You", "Following", and "Verified Impact" (with green shield-check icon).
  */
 export function FeedTabs({ activeTab, onTabChange, className }: FeedTabsProps) {
   return (
@@ -24,7 +24,7 @@ export function FeedTabs({ activeTab, onTabChange, className }: FeedTabsProps) {
       role="tablist"
       aria-label="Feed filter tabs"
       className={cn(
-        "flex items-center gap-2 border-b border-border bg-surface px-4 pt-2 rounded-t-[16px]",
+        "flex items-center gap-4 border-b border-border/80 bg-surface px-5 pt-2 rounded-t-[16px]",
         className,
       )}
     >
@@ -38,25 +38,22 @@ export function FeedTabs({ activeTab, onTabChange, className }: FeedTabsProps) {
             aria-selected={isActive}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "relative inline-flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+              "relative inline-flex items-center gap-1.5 px-2 py-2.5 text-sm font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer",
               isActive
-                ? "text-primary-dark"
+                ? "text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
             {tab.id === "verified-impact" ? (
-              <CheckCircle2
-                className={cn(
-                  "h-4 w-4",
-                  isActive ? "text-primary" : "text-muted-foreground",
-                )}
+              <ShieldCheck
+                className="h-4 w-4 text-primary"
                 aria-hidden="true"
               />
             ) : null}
             <span>{tab.label}</span>
             {isActive ? (
               <span
-                className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
+                className="absolute inset-x-0 bottom-0 h-[2.5px] rounded-full bg-primary"
                 aria-hidden="true"
               />
             ) : null}

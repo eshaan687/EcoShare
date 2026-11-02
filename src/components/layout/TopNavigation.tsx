@@ -1,12 +1,14 @@
 "use client";
 
-import { Show, UserButton } from "@clerk/nextjs";
-import { Bell, Plus, Search, User } from "lucide-react";
+import { Show, UserButton, useUser } from "@clerk/nextjs";
+import { Bell, ChevronDown, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
 import { CreateActionDialog } from "@/components/impact/CreateActionDialog";
+import { Avatar } from "@/components/ui/Avatar";
+import { PROTOTYPE_USER_PROFILE } from "@/lib/mock/prototype-data";
 import { cn } from "@/lib/utils";
 
 export interface TopNavigationProps {
@@ -15,13 +17,27 @@ export interface TopNavigationProps {
 
 /**
  * Matches the top search and utility bar in references/ecoshare-ui-reference.png:
- * search input ("Search EcoShare..."), green "+" create button, notifications bell,
- * profile shortcut, and Clerk authentication controls.
+ * rounded search input ("Search EcoShare..."), circular green "+" create button,
+ * notifications bell, profile avatar shortcut, and Clerk authentication controls.
  */
 export function TopNavigation({ className }: TopNavigationProps) {
   const router = useRouter();
+  const { isSignedIn, user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+
+  const displayName =
+    isSignedIn && user
+      ? user.fullName ||
+        user.username ||
+        user.primaryEmailAddress?.emailAddress ||
+        PROTOTYPE_USER_PROFILE.displayName
+      : PROTOTYPE_USER_PROFILE.displayName;
+
+  const avatarSrc =
+    isSignedIn && user?.imageUrl
+      ? user.imageUrl
+      : PROTOTYPE_USER_PROFILE.avatarSrc;
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,7 +54,7 @@ export function TopNavigation({ className }: TopNavigationProps) {
       <header
         aria-label="Desktop utility bar"
         className={cn(
-          "hidden md:flex items-center justify-between gap-4 rounded-[16px] border border-border bg-surface px-4 py-2.5 shadow-xs",
+          "hidden md:flex items-center justify-between gap-4 rounded-[18px] border border-border/80 bg-surface px-4 py-2.5 shadow-xs",
           className,
         )}
       >
@@ -58,29 +74,29 @@ export function TopNavigation({ className }: TopNavigationProps) {
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search EcoShare..."
             aria-label="Search EcoShare"
-            className="h-10 w-full min-w-0 rounded-full border border-border bg-background pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="h-10 w-full min-w-0 rounded-full border border-border/80 bg-background pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           />
         </form>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
             aria-label="Share an Environmental Action"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-3 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            title="Share an Environmental Action"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-xs transition-colors hover:bg-primary-dark outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer"
           >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden lg:inline">Share Action</span>
+            <Plus className="h-5 w-5" aria-hidden="true" />
           </button>
 
           <Link
             href="/notifications"
             aria-label="Notifications (3 sample items)"
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-secondary/35"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-background hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
-            <Bell className="h-4 w-4" aria-hidden="true" />
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span
-              className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white"
+              className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white"
               aria-hidden="true"
             >
               3
@@ -90,9 +106,18 @@ export function TopNavigation({ className }: TopNavigationProps) {
           <Link
             href="/profile"
             aria-label="View EcoShare profile"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-secondary/35"
+            className="inline-flex items-center gap-1 rounded-full pr-1 transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
-            <User className="h-4 w-4" aria-hidden="true" />
+            <Avatar
+              src={avatarSrc}
+              alt={displayName}
+              size="sm"
+              className="h-9 w-9 border border-border"
+            />
+            <ChevronDown
+              className="h-3.5 w-3.5 text-muted-foreground"
+              aria-hidden="true"
+            />
           </Link>
 
           <Suspense
@@ -110,13 +135,13 @@ export function TopNavigation({ className }: TopNavigationProps) {
               <div className="flex items-center gap-2 pl-1">
                 <Link
                   href="/login"
-                  className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-background"
+                  className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
                   Log In
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex h-9 items-center rounded-full bg-primary-dark px-3.5 text-xs font-semibold text-white transition-colors hover:bg-primary"
+                  className="hidden lg:inline-flex h-9 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
                   Get Started
                 </Link>

@@ -30,7 +30,7 @@ export default function AuthLayout({
         <div className="hidden lg:flex lg:col-span-6 flex-col justify-between rounded-[24px] border border-border bg-surface p-6 shadow-xs">
           <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-border">
             <Image
-              src="/images/hero-mountains.svg"
+              src="/images/hero-mountains.png"
               alt="EcoShare mountain landscape"
               fill
               sizes="520px"

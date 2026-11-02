@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
 
 export interface AvatarProps {
@@ -33,6 +34,9 @@ export function Avatar({
           ? "h-20 w-20 text-xl"
           : "h-10 w-10 text-sm";
 
+  const dimension =
+    size === "sm" ? 32 : size === "lg" ? 56 : size === "xl" ? 80 : 40;
+
   const computedInitials =
     initials ??
     resolvedLabel
@@ -44,10 +48,11 @@ export function Avatar({
 
   if (src) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={src}
         alt={resolvedLabel}
+        width={dimension}
+        height={dimension}
         className={cn(
           "shrink-0 rounded-full object-cover",
           sizeClasses,

@@ -48,10 +48,12 @@ describe("Milestone 1 UI Foundation components and prototype boundaries", () => 
       "verified-impact",
     );
 
-    expect(forYouPosts.length).toBe(3);
+    expect(forYouPosts.length).toBe(PROTOTYPE_POSTS.length);
     expect(followingPosts.every((post) => post.isFollowingAuthor)).toBe(true);
     expect(verifiedPosts.every((post) => post.isVerifiedImpact)).toBe(true);
-    expect(verifiedPosts.length).toBe(2);
+    expect(verifiedPosts.length).toBe(
+      PROTOTYPE_POSTS.filter((post) => post.isVerifiedImpact).length,
+    );
   });
 
   it("renders EcoShareLogo and PrototypeBanner with clear prototype messaging", () => {
@@ -72,7 +74,7 @@ describe("Milestone 1 UI Foundation components and prototype boundaries", () => 
     expect(screen.getByText("Level 4: Planet Protector")).toBeTruthy();
     expect(screen.getByText("420 XP Points")).toBeTruthy();
     expect(screen.getByText(/Next Level: Earth Champion/i)).toBeTruthy();
-    expect(screen.getByText("700 XP")).toBeTruthy();
+    expect(screen.getAllByText(/700 XP/i).length).toBeGreaterThan(0);
   });
 
   it("renders Sofia M.'s reference post card with Verified Impact indicator and interactive local like toggle", () => {

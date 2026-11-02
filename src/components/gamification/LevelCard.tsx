@@ -19,31 +19,38 @@ export function LevelCard({ totalXp, className }: LevelCardProps) {
   const progress = calculateLevelProgress(totalXp);
 
   return (
-    <Card className={cn("p-5", className)}>
-      <div className="flex items-center justify-between gap-2 mb-3">
+    <Card className={cn("p-5 shadow-xs", className)}>
+      <div className="flex items-center justify-between gap-2 mb-3.5">
         <h3 className="text-base font-bold text-foreground">Your Level</h3>
         <Badge variant="prototype">Sample Progression</Badge>
       </div>
 
-      <div className="rounded-xl border border-secondary bg-secondary/20 p-3.5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">
-            <Leaf className="h-5 w-5" aria-hidden="true" />
+      <div className="rounded-2xl border border-border/80 bg-background/60 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary/75 text-primary-dark shadow-2xs">
+              <Leaf className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-base font-bold text-foreground truncate">
+                Level {progress.currentLevel.level}: {progress.currentLevel.name}
+              </p>
+              <p className="text-xs font-medium text-primary-dark">
+                {progress.totalXp} XP Points
+              </p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-foreground truncate">
-              Level {progress.currentLevel.level}: {progress.currentLevel.name}
-            </p>
-            <p className="text-xs font-medium text-primary-dark">
-              {progress.totalXp} XP Points
-            </p>
-          </div>
+
+          <span className="shrink-0 text-xs font-bold text-foreground">
+            {progress.totalXp} / {progress.nextLevel?.xpRequired ?? progress.totalXp} XP
+          </span>
         </div>
 
-        <div className="mt-3.5 space-y-1.5">
+        <div className="mt-4 space-y-1.5">
           <ProgressBar
             value={progress.progressPercentage}
-            label={`XP progress toward next level`}
+            label="XP progress toward next level"
+            className="h-2.5"
           />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1 font-medium text-foreground">
@@ -54,7 +61,8 @@ export function LevelCard({ totalXp, className }: LevelCardProps) {
             </span>
             {progress.nextLevel ? (
               <span className="font-semibold text-primary-dark">
-                {progress.nextLevel.xpRequired} XP
+                {progress.xpNeededForNextLevel} XP to Level {progress.nextLevel.level} (
+                {progress.nextLevel.xpRequired} XP)
               </span>
             ) : null}
           </div>

@@ -7,7 +7,7 @@ test.describe("Milestone 1 UI Foundation & Responsive Verification", () => {
   test("renders Welcome & Onboarding page (/) without horizontal overflow", async ({
     page,
   }, testInfo) => {
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
     await expect(
       page.getByRole("heading", {
@@ -51,12 +51,12 @@ test.describe("Milestone 1 UI Foundation & Responsive Verification", () => {
   test("renders /home feed in guest preview mode with working tabs, action dialog, and zero horizontal overflow", async ({
     page,
   }, testInfo) => {
-    await page.goto("/home");
+    await page.goto("/home", { waitUntil: "domcontentloaded" });
 
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Share Actions. Inspire Change.",
+        name: /Share Actions\.\s*Inspire Change\./i,
       }),
     ).toBeVisible();
 
@@ -152,7 +152,7 @@ test.describe("Milestone 1 UI Foundation & Responsive Verification", () => {
     ] as const;
 
     for (const route of routesToVerify) {
-      await page.goto(route.path);
+      await page.goto(route.path, { waitUntil: "domcontentloaded" });
       await expect(
         page.getByRole("heading", { level: 1, name: route.heading }),
       ).toBeVisible();
@@ -166,12 +166,48 @@ test.describe("Milestone 1 UI Foundation & Responsive Verification", () => {
       expect(hasHorizontalOverflow).toBe(false);
 
       if (
+        route.path === "/explore" &&
+        testInfo.project.name === "desktop-1440"
+      ) {
+        await page.screenshot({
+          path: `${ARTIFACT_DIR}/milestone1-explore-desktop-1440.png`,
+          fullPage: true,
+        });
+      }
+      if (
+        route.path === "/communities" &&
+        testInfo.project.name === "desktop-1440"
+      ) {
+        await page.screenshot({
+          path: `${ARTIFACT_DIR}/milestone1-communities-desktop-1440.png`,
+          fullPage: true,
+        });
+      }
+      if (
+        route.path === "/challenges" &&
+        testInfo.project.name === "desktop-1440"
+      ) {
+        await page.screenshot({
+          path: `${ARTIFACT_DIR}/milestone1-challenges-desktop-1440.png`,
+          fullPage: true,
+        });
+      }
+      if (
         route.path === "/profile" &&
         testInfo.project.name === "desktop-1440"
       ) {
         await page.screenshot({
           path: `${ARTIFACT_DIR}/milestone1-profile-desktop-1440.png`,
           fullPage: true,
+        });
+
+        const badgesHeading = page.getByRole("heading", {
+          name: /Your Badges \(4\/12\)/i,
+        });
+        await badgesHeading.scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: `${ARTIFACT_DIR}/milestone1-badges-levels-desktop-1440.png`,
+          fullPage: false,
         });
       }
       if (
@@ -181,6 +217,15 @@ test.describe("Milestone 1 UI Foundation & Responsive Verification", () => {
         await page.screenshot({
           path: `${ARTIFACT_DIR}/milestone1-impact-desktop-1440.png`,
           fullPage: true,
+        });
+
+        const verificationHeading = page.getByRole("heading", {
+          name: "Verification Review",
+        });
+        await verificationHeading.scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: `${ARTIFACT_DIR}/milestone1-admin-verification-desktop-1440.png`,
+          fullPage: false,
         });
       }
     }

@@ -1,7 +1,16 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { CheckCircle2, ImagePlus, Info, Lock, MapPin, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  Image as ImageIcon,
+  Info,
+  Lock,
+  MapPin,
+  MessageSquare,
+  ShieldCheck,
+  Video,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -20,11 +29,12 @@ export interface CreateActionDialogProps {
 
 /**
  * Matches the "Share an Environmental Action" modal in the bottom-left panel of
- * references/ecoshare-ui-reference.png.
- *
- * Strictly enforces Milestone 1 prototype rules:
- * - Unauthenticated visitors receive a clear sign-in prompt alongside the UI preview.
- * - Submitting displays a local UI preview notice rather than a fake database/storage write.
+ * references/ecoshare-ui-reference.png:
+ * - Segmented mode tabs ("Community Post" vs "Impact Submission (Get points & verified)")
+ * - Photo/video upload box ("Upload photos or videos (max 5 · 100 MB each)")
+ * - Description textarea ("Describe what you did... (e.g., cleaned a park, recycled waste, planted trees)")
+ * - Optional location row ("Add location (optional)")
+ * - Cancel and "Submit for Verification" footer actions
  */
 export function CreateActionDialog({
   open,
@@ -69,7 +79,7 @@ export function CreateActionDialog({
         <div
           role="tablist"
           aria-label="Submission mode"
-          className="grid grid-cols-1 gap-2 rounded-xl bg-background p-1.5 sm:grid-cols-2"
+          className="grid grid-cols-1 gap-2.5 sm:grid-cols-2"
         >
           <button
             type="button"
@@ -80,14 +90,16 @@ export function CreateActionDialog({
               setPreviewNotice(null);
             }}
             className={cn(
-              "rounded-lg px-3 py-2 text-xs font-semibold transition-colors text-left sm:text-center",
+              "flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer",
               mode === "post"
-                ? "bg-surface text-foreground shadow-xs border border-border"
-                : "text-muted-foreground hover:text-foreground",
+                ? "border-primary bg-secondary/45 text-foreground shadow-2xs"
+                : "border-border bg-background/70 text-muted-foreground hover:text-foreground",
             )}
           >
-            Community Post
+            <MessageSquare className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <span>Community Post</span>
           </button>
+
           <button
             type="button"
             role="tab"
@@ -97,13 +109,19 @@ export function CreateActionDialog({
               setPreviewNotice(null);
             }}
             className={cn(
-              "rounded-lg px-3 py-2 text-xs font-semibold transition-colors text-left sm:text-center",
+              "flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer",
               mode === "impact"
-                ? "bg-secondary/60 text-primary-dark shadow-xs border border-primary/40"
-                : "text-muted-foreground hover:text-foreground",
+                ? "border-primary bg-secondary/45 text-foreground shadow-2xs"
+                : "border-border bg-background/70 text-muted-foreground hover:text-foreground",
             )}
           >
-            Impact Submission (Get points &amp; verified)
+            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+            <span className="text-left leading-tight">
+              <strong className="block text-foreground">Impact Submission</strong>
+              <span className="text-[11px] font-normal text-muted-foreground">
+                (Get points &amp; verified)
+              </span>
+            </span>
           </button>
         </div>
 
@@ -134,33 +152,45 @@ export function CreateActionDialog({
         ) : null}
 
         {/* Photo / Video Upload Placeholder matching reference image */}
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-foreground">
-            {mode === "impact"
-              ? "Environmental Evidence (Private Verifier Review)"
-              : "Post Media (Public Feed)"}
-          </label>
-          <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/40 bg-secondary/15 px-4 py-6 text-center">
-            <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-secondary/60 text-primary-dark">
-              <ImagePlus className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <p className="text-sm font-semibold text-foreground">Upload Photo or Video</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Drag &amp; drop or click to upload (Prototype UI preview — Supabase Storage wired in
-              Milestones 2 &amp; 4)
-            </p>
-            <div className="mt-2">
-              <Badge variant="prototype">
-                {mode === "impact"
-                  ? "Target Bucket: private-impact-evidence"
-                  : "Target Bucket: public-post-media"}
-              </Badge>
-            </div>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-background/80 px-4 py-6 text-center">
+          <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
+            <ImageIcon className="h-5 w-5" aria-hidden="true" />
+            <Video className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <p className="text-sm font-semibold text-foreground">
+            Upload photos or videos
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            (max 5 · 100 MB each)
+          </p>
+          <div className="mt-2">
+            <Badge variant="prototype">
+              {mode === "impact"
+                ? "Target Bucket: private-impact-evidence"
+                : "Target Bucket: public-post-media"}
+            </Badge>
           </div>
         </div>
 
-        {/* Category & Description */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {/* Description matching reference image */}
+        <div>
+          <label
+            htmlFor="action-description"
+            className="sr-only"
+          >
+            Action Description
+          </label>
+          <Textarea
+            id="action-description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Describe what you did... (e.g., cleaned a park, recycled waste, planted trees)"
+            rows={3}
+          />
+        </div>
+
+        {/* Category & Location matching reference image */}
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           <div>
             <label
               htmlFor="action-category"
@@ -172,7 +202,7 @@ export function CreateActionDialog({
               id="action-category"
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="h-10 w-full rounded-[8px] border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="h-10 w-full rounded-[8px] border border-border bg-surface px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               <option value="Community Cleanup">Community Cleanup</option>
               <option value="Tree Planting">Tree Planting</option>
@@ -187,7 +217,7 @@ export function CreateActionDialog({
               htmlFor="action-location"
               className="mb-1 block text-xs font-semibold text-foreground"
             >
-              Add Location (Optional)
+              Add location (optional)
             </label>
             <div className="relative">
               <MapPin
@@ -198,39 +228,12 @@ export function CreateActionDialog({
                 id="action-location"
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
-                placeholder="e.g., Fundidora Park, Monterrey"
+                placeholder="Add location (optional)"
                 className="pl-9"
               />
             </div>
           </div>
         </div>
-
-        <div>
-          <label
-            htmlFor="action-description"
-            className="mb-1 block text-xs font-semibold text-foreground"
-          >
-            Action Description
-          </label>
-          <Textarea
-            id="action-description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Describe your action... What did you do and why does it matter?"
-            rows={3}
-          />
-        </div>
-
-        {mode === "impact" ? (
-          <div className="flex items-start gap-2 rounded-xl border border-secondary bg-secondary/20 p-3 text-xs text-primary-dark">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-            <span>
-              <strong>Human Verification Guarantee:</strong> Environmental XP is never awarded
-              automatically by likes or ordinary posts. Authorised verifiers review every impact
-              submission before awarding XP.
-            </span>
-          </div>
-        ) : null}
 
         {previewNotice ? (
           <div
@@ -246,7 +249,7 @@ export function CreateActionDialog({
           </div>
         ) : null}
 
-        <div className="flex flex-col-reverse justify-end gap-2 border-t border-border pt-3 sm:flex-row">
+        <div className="grid grid-cols-2 gap-3 border-t border-border pt-3.5">
           <Button
             type="button"
             variant="secondary"
@@ -254,11 +257,12 @@ export function CreateActionDialog({
               setPreviewNotice(null);
               onOpenChange(false);
             }}
+            className="w-full"
           >
             Cancel
           </Button>
-          <Button type="submit" variant="primary">
-            {mode === "impact" ? "Submit for Verification" : "Preview Post"}
+          <Button type="submit" variant="primary" className="w-full">
+            {mode === "impact" ? "Submit for Verification" : "Publish Post"}
           </Button>
         </div>
       </form>

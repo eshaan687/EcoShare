@@ -1,11 +1,10 @@
 "use client";
 
-import { Check, MapPin, ShieldAlert, X } from "lucide-react";
+import { Check, Inbox, MoreHorizontal, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { PrototypeVerificationReviewItem } from "@/lib/mock/prototype-data";
 import { cn } from "@/lib/utils";
@@ -16,12 +15,11 @@ export interface VerificationReviewCardProps {
 }
 
 /**
- * Matches the "Verification Review" admin/verifier panel in the bottom-left/center of
- * references/ecoshare-ui-reference.png (Pending (12) | Approved | Rejected tabs,
- * Sofia M. Cleanup Activity preview, Approve & Reject buttons).
- *
- * Strictly labeled as a Milestone 1 UI preview: real verifier role checks and
- * atomic `approve_impact_submission` RPC execution are wired in Milestone 4.
+ * Matches the "Verification Review" admin/verifier panel in the bottom-second-from-left of
+ * references/ecoshare-ui-reference.png:
+ * - Pill tabs: Pending (12) | Approved | Rejected
+ * - Sofia M. Cleanup Activity card with realistic park cleanup photo
+ * - Side-by-side "✓ Approve" (green) and "✕ Reject" (soft red) buttons
  */
 export function VerificationReviewCard({ items, className }: VerificationReviewCardProps) {
   const [activeQueueTab, setActiveQueueTab] = useState<"pending" | "approved" | "rejected">(
@@ -37,13 +35,11 @@ export function VerificationReviewCard({ items, className }: VerificationReviewC
     : "pending";
 
   return (
-    <Card className={cn("p-5", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <div>
+    <Card className={cn("p-5 shadow-xs", className)}>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
+        <div className="flex items-center gap-2">
+          <Inbox className="h-4 w-4 text-foreground" aria-hidden="true" />
           <h3 className="text-base font-bold text-foreground">Verification Review</h3>
-          <p className="text-xs text-muted-foreground">
-            Verifier workflow preview (Database RPC enforced in Milestone 4)
-          </p>
         </div>
         <Badge variant="prototype">Verifier Queue Preview</Badge>
       </div>
@@ -52,7 +48,7 @@ export function VerificationReviewCard({ items, className }: VerificationReviewC
       <div
         role="tablist"
         aria-label="Verification review status tabs"
-        className="mb-4 flex items-center gap-1.5 border-b border-border pb-2"
+        className="mb-4 grid grid-cols-3 gap-1.5 rounded-xl bg-background p-1"
       >
         {(
           [
@@ -68,10 +64,10 @@ export function VerificationReviewCard({ items, className }: VerificationReviewC
             aria-selected={activeQueueTab === tab.id}
             onClick={() => setActiveQueueTab(tab.id)}
             className={cn(
-              "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+              "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer",
               activeQueueTab === tab.id
-                ? "bg-primary text-white"
-                : "text-muted-foreground hover:bg-background hover:text-foreground",
+                ? "bg-secondary/75 text-primary-dark shadow-2xs"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             {tab.label}
@@ -80,9 +76,9 @@ export function VerificationReviewCard({ items, className }: VerificationReviewC
       </div>
 
       {firstItem ? (
-        <div className="rounded-xl border border-border bg-background/60 p-3.5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative h-20 w-full overflow-hidden rounded-xl border border-border sm:w-28 shrink-0">
+        <div className="rounded-2xl border border-border/80 bg-surface p-4 shadow-2xs">
+          <div className="flex items-start gap-3.5">
+            <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-xl border border-border/70">
               <Image
                 src={firstItem.thumbnailSrc}
                 alt={firstItem.activityTitle}
@@ -93,73 +89,76 @@ export function VerificationReviewCard({ items, className }: VerificationReviewC
             </div>
 
             <div className="min-w-0 flex-1 space-y-1">
-              <div className="flex flex-wrap items-center justify-between gap-1">
-                <p className="text-sm font-bold text-foreground">
-                  {firstItem.submitterName}{" "}
-                  <span className="font-normal text-xs text-muted-foreground">
-                    · {firstItem.submittedRelative}
-                  </span>
-                </p>
-                <Badge
-                  variant={
-                    currentStatus === "approved"
-                      ? "verified"
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs font-semibold text-foreground">
+                    Submitted by {firstItem.submitterName}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {firstItem.submittedRelative}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Badge
+                    variant={
+                      currentStatus === "approved"
+                        ? "verified"
+                        : currentStatus === "rejected"
+                          ? "error"
+                          : "warning"
+                    }
+                  >
+                    {currentStatus === "approved"
+                      ? "Preview: Approved"
                       : currentStatus === "rejected"
-                        ? "error"
-                        : "warning"
-                  }
-                >
-                  {currentStatus === "approved"
-                    ? "Preview: Approved"
-                    : currentStatus === "rejected"
-                      ? "Preview: Rejected"
-                      : "Pending Review"}
-                </Badge>
+                        ? "Preview: Rejected"
+                        : "Pending Review"}
+                  </Badge>
+                  <MoreHorizontal
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
-              <p className="text-xs font-semibold text-primary-dark">{firstItem.activityTitle}</p>
-              <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                {firstItem.location}
+
+              <p className="pt-1 text-sm font-bold text-foreground">
+                {firstItem.activityTitle}
               </p>
+              <p className="text-xs text-muted-foreground">{firstItem.location}</p>
             </div>
           </div>
 
-          <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
-            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-              <ShieldAlert className="h-3.5 w-3.5 text-primary-dark" aria-hidden="true" />
-              Local UI state only — no XP awarded in Milestone 1
-            </span>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="primary"
-                onClick={() =>
-                  setLocalDecisionById((prev) => ({
-                    ...prev,
-                    [firstItem.id]: "approved",
-                  }))
-                }
-              >
-                <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                Approve
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="danger"
-                onClick={() =>
-                  setLocalDecisionById((prev) => ({
-                    ...prev,
-                    [firstItem.id]: "rejected",
-                  }))
-                }
-              >
-                <X className="h-3.5 w-3.5" aria-hidden="true" />
-                Reject
-              </Button>
-            </div>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() =>
+                setLocalDecisionById((prev) => ({
+                  ...prev,
+                  [firstItem.id]: "approved",
+                }))
+              }
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-primary px-4 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-primary-dark outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer"
+            >
+              <Check className="h-4 w-4" aria-hidden="true" />
+              <span>Approve</span>
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setLocalDecisionById((prev) => ({
+                  ...prev,
+                  [firstItem.id]: "rejected",
+                }))
+              }
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-error/30 bg-error/10 px-4 text-xs font-semibold text-error transition-colors hover:bg-error/20 outline-none focus-visible:ring-2 focus-visible:ring-error/50 cursor-pointer"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+              <span>Reject</span>
+            </button>
           </div>
+          <p className="mt-2.5 text-center text-[11px] text-muted-foreground">
+            Local UI preview state only — no XP awarded or persisted in Milestone 1
+          </p>
         </div>
       ) : null}
     </Card>

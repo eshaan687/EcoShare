@@ -6,6 +6,7 @@ export interface PrototypeAuthor {
   readonly displayName: string;
   readonly avatarInitials: string;
   readonly avatarColor: string;
+  readonly avatarSrc?: string;
   readonly location: string;
   readonly isVerifiedContributor: boolean;
 }
@@ -75,6 +76,7 @@ export interface PrototypeProfileSummary {
   readonly bio: string;
   readonly location: string;
   readonly joinedLabel: string;
+  readonly avatarSrc: string;
   readonly coverSrc: string;
   readonly isVerifiedContributor: boolean;
   readonly totalXp: number;
@@ -110,7 +112,8 @@ export const PROTOTYPE_USER_PROFILE: PrototypeProfileSummary = {
   bio: "Urban reforestation volunteer & watershed cleanup organizer. Sharing community actions for a cleaner planet.",
   location: "Monterrey, Mexico",
   joinedLabel: "Joined EcoShare · Prototype Preview",
-  coverSrc: "/images/hero-mountains.svg",
+  avatarSrc: "/images/avatar-alex.png",
+  coverSrc: "/images/hero-mountains.png",
   isVerifiedContributor: true,
   totalXp: 420,
   verifiedActionsCount: 7,
@@ -173,6 +176,7 @@ export const PROTOTYPE_POSTS: readonly PrototypePost[] = [
       displayName: "Sofia M.",
       avatarInitials: "SM",
       avatarColor: "#15803D",
+      avatarSrc: "/images/avatar-sofia.png",
       location: "Monterrey, Mexico",
       isVerifiedContributor: true,
     },
@@ -185,12 +189,12 @@ export const PROTOTYPE_POSTS: readonly PrototypePost[] = [
     media: [
       {
         id: "media-sofia-1",
-        src: "/images/cleanup-park.svg",
+        src: "/images/cleanup-park.png",
         alt: "Gloved volunteer hand collecting recyclable plastic bottle on park grass",
       },
       {
         id: "media-sofia-2",
-        src: "/images/cleanup-team.svg",
+        src: "/images/cleanup-team.png",
         alt: "Four classmates in recycling volunteer shirts smiling at Fundidora Park",
         hasVerifiedImpactBadge: true,
       },
@@ -208,6 +212,7 @@ export const PROTOTYPE_POSTS: readonly PrototypePost[] = [
       displayName: "Marcus V.",
       avatarInitials: "MV",
       avatarColor: "#047857",
+      avatarSrc: "/images/avatar-marcus.png",
       location: "Portland, USA",
       isVerifiedContributor: true,
     },
@@ -220,7 +225,7 @@ export const PROTOTYPE_POSTS: readonly PrototypePost[] = [
     media: [
       {
         id: "media-marcus-1",
-        src: "/images/challenge-trees.svg",
+        src: "/images/challenge-trees.png",
         alt: "Newly planted native sapling in rich soil",
         hasVerifiedImpactBadge: true,
       },
@@ -228,6 +233,68 @@ export const PROTOTYPE_POSTS: readonly PrototypePost[] = [
     initialLikes: 142,
     initialComments: 19,
     initialBookmarked: true,
+  },
+  {
+    id: "post-david-oceans",
+    isPrototype: true,
+    author: {
+      id: "author-david",
+      username: "davidl",
+      displayName: "David L.",
+      avatarInitials: "DL",
+      avatarColor: "#0284C7",
+      avatarSrc: "/images/avatar-alex.png",
+      location: "San Diego, USA",
+      isVerifiedContributor: true,
+    },
+    publishedRelative: "8 hours ago",
+    content:
+      "Recorded 14 kg of marine microplastics and abandoned fishing gear removed during our low-tide shoreline survey at Balboa Cove. Clean waters protect our marine life! 🌊🐢",
+    category: "Ocean Conservation",
+    isVerifiedImpact: true,
+    isFollowingAuthor: false,
+    media: [
+      {
+        id: "media-david-1",
+        src: "/images/challenge-oceans.png",
+        alt: "Green sea turtle in turquoise coastal waters",
+        hasVerifiedImpactBadge: true,
+      },
+    ],
+    initialLikes: 198,
+    initialComments: 14,
+    initialBookmarked: false,
+  },
+  {
+    id: "post-maya-pollinators",
+    isPrototype: true,
+    author: {
+      id: "author-maya",
+      username: "mayas",
+      displayName: "Maya S.",
+      avatarInitials: "MS",
+      avatarColor: "#D97706",
+      avatarSrc: "/images/avatar-elena.png",
+      location: "Vancouver, Canada",
+      isVerifiedContributor: true,
+    },
+    publishedRelative: "12 hours ago",
+    content:
+      "Planted a native clover and lavender micro-meadow to support urban bumblebee populations. Documented flower coverage and visitor density for our local biodiversity audit! 🐝🌸",
+    category: "Wildlife Conservation",
+    isVerifiedImpact: true,
+    isFollowingAuthor: true,
+    media: [
+      {
+        id: "media-maya-1",
+        src: "/images/wildlife-pollinator.png",
+        alt: "Bumblebee pollinating purple wildflower blossoms in community garden",
+        hasVerifiedImpactBadge: true,
+      },
+    ],
+    initialLikes: 215,
+    initialComments: 23,
+    initialBookmarked: false,
   },
   {
     id: "post-elena-discussion",
@@ -238,6 +305,7 @@ export const PROTOTYPE_POSTS: readonly PrototypePost[] = [
       displayName: "Elena K.",
       avatarInitials: "EK",
       avatarColor: "#0369A1",
+      avatarSrc: "/images/avatar-elena.png",
       location: "Lisbon, Portugal",
       isVerifiedContributor: false,
     },
@@ -262,7 +330,7 @@ export const PROTOTYPE_CHALLENGES: readonly PrototypeChallenge[] = [
     title: "Clean Oceans Challenge",
     description: "Collect and properly dispose of litter in your area.",
     category: "Community Cleanup",
-    thumbnailSrc: "/images/challenge-oceans.svg",
+    thumbnailSrc: "/images/challenge-oceans.png",
     participantsCount: 12430,
     rewardXp: 75,
     durationLabel: "14 days remaining",
@@ -274,7 +342,7 @@ export const PROTOTYPE_CHALLENGES: readonly PrototypeChallenge[] = [
     title: "Plant for Tomorrow",
     description: "Plant trees or support reforestation efforts.",
     category: "Tree Planting",
-    thumbnailSrc: "/images/challenge-trees.svg",
+    thumbnailSrc: "/images/challenge-trees.png",
     participantsCount: 8920,
     rewardXp: 100,
     durationLabel: "21 days remaining",
@@ -286,7 +354,7 @@ export const PROTOTYPE_CHALLENGES: readonly PrototypeChallenge[] = [
     title: "7-Day Plastic Reduction Challenge",
     description: "Eliminate single-use plastics for a full week and document your swaps.",
     category: "Recycling Initiatives",
-    thumbnailSrc: "/images/cleanup-park.svg",
+    thumbnailSrc: "/images/cleanup-park.png",
     participantsCount: 5340,
     rewardXp: 50,
     durationLabel: "7 days remaining",
@@ -303,7 +371,7 @@ export const PROTOTYPE_COMMUNITIES: readonly PrototypeCommunity[] = [
     category: "Ocean Conservation",
     membersCount: 14820,
     visibility: "public",
-    bannerSrc: "/images/challenge-oceans.svg",
+    bannerSrc: "/images/challenge-oceans.png",
   },
   {
     id: "community-urban-gardening",
@@ -314,7 +382,7 @@ export const PROTOTYPE_COMMUNITIES: readonly PrototypeCommunity[] = [
     category: "Tree Planting",
     membersCount: 9640,
     visibility: "public",
-    bannerSrc: "/images/challenge-trees.svg",
+    bannerSrc: "/images/challenge-trees.png",
   },
   {
     id: "community-recycling-initiatives",
@@ -325,7 +393,7 @@ export const PROTOTYPE_COMMUNITIES: readonly PrototypeCommunity[] = [
     category: "Recycling Initiatives",
     membersCount: 7210,
     visibility: "public",
-    bannerSrc: "/images/cleanup-park.svg",
+    bannerSrc: "/images/cleanup-park.png",
   },
 ];
 
@@ -371,7 +439,7 @@ export const PROTOTYPE_VERIFICATION_QUEUE: readonly PrototypeVerificationReviewI
     activityTitle: "Cleanup Activity",
     category: "Community Cleanup",
     location: "Fundidora Park, Monterrey",
-    thumbnailSrc: "/images/cleanup-park.svg",
+    thumbnailSrc: "/images/cleanup-park.png",
     status: "pending",
   },
 ];

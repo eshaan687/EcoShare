@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  /* Approved EcoShare Raw Color Tokens (ECOSHARE_DESIGN_SYSTEM.md §3) */
+  --ecoshare-primary: #22C55E;
+  --ecoshare-primary-dark: #15803D;
+  --ecoshare-secondary: #A7F3D0;
+
+  --ecoshare-background: #F8FAFC;
+  --ecoshare-surface: #FFFFFF;
+
+  --ecoshare-text-primary: #0F172A;
+  --ecoshare-text-secondary: #64748B;
+
+  --ecoshare-border: #E2E8F0;
+
+  --ecoshare-success: #10B981;
+  --ecoshare-warning: #F59E0B;
+  --ecoshare-error: #EF4444;
+
+  /* Approved EcoShare Raw Shape & Radius Tokens (ECOSHARE_DESIGN_SYSTEM.md §6) */
+  --ecoshare-radius-control: 8px;
+  --ecoshare-radius-button: 12px;
+  --ecoshare-radius-pill: 9999px;
+  --ecoshare-radius-card: 16px;
+  --ecoshare-radius-feature: 20px;
+  --ecoshare-radius-dialog: 20px;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  /* Tailwind v4 Color Mappings (Distinct from :root --ecoshare-* tokens) */
+  --color-primary: var(--ecoshare-primary);
+  --color-primary-dark: var(--ecoshare-primary-dark);
+  --color-secondary: var(--ecoshare-secondary);
+  --color-background: var(--ecoshare-background);
+  --color-surface: var(--ecoshare-surface);
+  --color-text-primary: var(--ecoshare-text-primary);
+  --color-text-secondary: var(--ecoshare-text-secondary);
+  --color-border: var(--ecoshare-border);
+  --color-success: var(--ecoshare-success);
+  --color-warning: var(--ecoshare-warning);
+  --color-error: var(--ecoshare-error);
+
+  /* Tailwind v4 Border Radius Mappings */
+  --radius-control: var(--ecoshare-radius-control);
+  --radius-button: var(--ecoshare-radius-button);
+  --radius-pill: var(--ecoshare-radius-pill);
+  --radius-card: var(--ecoshare-radius-card);
+  --radius-feature: var(--ecoshare-radius-feature);
+  --radius-dialog: var(--ecoshare-radius-dialog);
+
+  --radius-sm: var(--ecoshare-radius-control);
+  --radius-md: var(--ecoshare-radius-button);
+  --radius-lg: var(--ecoshare-radius-card);
+  --radius-xl: var(--ecoshare-radius-feature);
+  --radius-full: var(--ecoshare-radius-pill);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--ecoshare-border);
+  }
+
+  body {
+    background-color: var(--ecoshare-background);
+    color: var(--ecoshare-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

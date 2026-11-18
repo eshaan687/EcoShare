@@ -14,8 +14,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { EcoShareLogo } from "@/components/branding/EcoShareLogo";
+import { useSafeUser } from "@/lib/auth/clerk-hooks";
+import { useSafeSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 export interface NavItemDefinition {
@@ -35,7 +38,7 @@ export const PRIMARY_NAV_ITEMS: readonly NavItemDefinition[] = [
 
 export const SECONDARY_NAV_ITEMS: readonly NavItemDefinition[] = [
   { href: "/messages", label: "Messages", icon: MessageSquare },
-  { href: "/notifications", label: "Notifications", icon: Bell, badgeCount: 3 },
+  { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/bookmarks", label: "Bookmarks", icon: Bookmark },
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
@@ -46,12 +49,56 @@ export interface DesktopSidebarProps {
 
 /**
  * Matches the left navigation column in references/ecoshare-ui-reference.png:
- * - Soft mint-green active state (`bg-secondary/65 text-foreground`) with green icon
- *   and no unintended browser focus ring.
+ * - Soft mint-green active state (`bg-secondary/65 text-foreground`) with green icon.
  * - Deep forest-green promotional challenge card at the bottom with white pill CTA.
+ * - Live unread notification & message request counts from Supabase.
  */
 export function DesktopSidebar({ className }: DesktopSidebarProps) {
   const pathname = usePathname();
+  const supabase = useSafeSupabaseClient();
+  const { user, isSignedIn } = useSafeUser();
+  const userId = user?.id ?? null;
+
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  useEffect(() => {
+    if (!supabase || !isSignedIn || !userId) return;
+
+    let cancelled = false;
+    async function loadUnread() {
+      const { count } = await supabase!
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", userId!)
+        .eq("is_read", false);
+      if (!cancelled) {
+        setUnreadNotifications(count ?? 0);
+      }
+    }
+
+    void Promise.resolve().then(() => loadUnread());
+
+    const channel = supabase
+      .channel("sidebar-unread-notifications")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${userId}`,
+        },
+        () => {
+          void loadUnread();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      void supabase.removeChannel(channel);
+    };
+  }, [supabase, isSignedIn, userId]);
 
   function isRouteActive(href: string): boolean {
     return pathname === href || pathname.startsWith(`${href}/`);
@@ -105,6 +152,9 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
           {SECONDARY_NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = isRouteActive(item.href);
+            const badgeCount =
+              item.href === "/notifications" ? unreadNotifications : 0;
+
             return (
               <Link
                 key={item.href}
@@ -128,12 +178,12 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                   <span>{item.label}</span>
                 </span>
 
-                {item.badgeCount ? (
+                {badgeCount > 0 ? (
                   <span
-                    aria-label={`${item.badgeCount} sample notifications`}
+                    aria-label={`${badgeCount} unread notifications`}
                     className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-white"
                   >
-                    {item.badgeCount}
+                    {badgeCount}
                   </span>
                 ) : null}
               </Link>

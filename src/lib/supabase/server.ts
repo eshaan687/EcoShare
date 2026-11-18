@@ -16,13 +16,16 @@ export async function createClient(): Promise<SupabaseClient<Database>> {
 
   if (!isSupabaseClientConfigured(env)) {
     throw new Error(
-      "Supabase server client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local.",
+      "Supabase server client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local.",
     );
   }
 
+  const publishableKey =
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   return createSupabaseClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    publishableKey,
     {
       async accessToken() {
         const clerkAuth = await auth();

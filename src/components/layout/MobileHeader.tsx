@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { EcoShareLogo } from "@/components/branding/EcoShareLogo";
+import { isClerkClientConfigured } from "@/lib/env.client";
 import { cn } from "@/lib/utils";
 
 export interface MobileHeaderProps {
@@ -13,11 +14,49 @@ export interface MobileHeaderProps {
   readonly className?: string;
 }
 
+function ClerkMobileAuth() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="h-8 w-14 animate-pulse rounded-full bg-border/60"
+          aria-hidden="true"
+        />
+      }
+    >
+      <Show when="signed-in">
+        <UserButton />
+      </Show>
+      <Show when="signed-out">
+        <Link
+          href="/login"
+          className="inline-flex h-8 items-center rounded-full bg-primary px-3 text-xs font-semibold text-white hover:bg-primary-dark"
+        >
+          Log In
+        </Link>
+      </Show>
+    </Suspense>
+  );
+}
+
+function GuestMobileAuth() {
+  return (
+    <Link
+      href="/login"
+      className="inline-flex h-8 items-center rounded-full bg-primary px-3 text-xs font-semibold text-white hover:bg-primary-dark"
+    >
+      Log In
+    </Link>
+  );
+}
+
 /**
  * Matches the mobile top header in references/ecoshare-ui-reference.png:
  * Hamburger menu trigger, EcoShare logo, search icon link, and Clerk user/login control.
  */
 export function MobileHeader({ onOpenDrawer, className }: MobileHeaderProps) {
+  const clerkConfigured = isClerkClientConfigured();
+
   return (
     <header
       aria-label="Mobile top bar"
@@ -47,26 +86,7 @@ export function MobileHeader({ onOpenDrawer, className }: MobileHeaderProps) {
           <Search className="h-4 w-4" aria-hidden="true" />
         </Link>
 
-        <Suspense
-          fallback={
-            <div
-              className="h-8 w-14 animate-pulse rounded-full bg-border/60"
-              aria-hidden="true"
-            />
-          }
-        >
-          <Show when="signed-in">
-            <UserButton />
-          </Show>
-          <Show when="signed-out">
-            <Link
-              href="/login"
-              className="inline-flex h-8 items-center rounded-full bg-primary px-3 text-xs font-semibold text-white hover:bg-primary-dark"
-            >
-              Log In
-            </Link>
-          </Show>
-        </Suspense>
+        {clerkConfigured ? <ClerkMobileAuth /> : <GuestMobileAuth />}
       </div>
     </header>
   );

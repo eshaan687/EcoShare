@@ -4,8 +4,8 @@
   "private": true,
   "description": "EcoShare — Global Environmental Social Network (Share Actions. Inspire Change.)",
   "engines": {
-    "node": ">=24.0.0 <25.0.0",
-    "pnpm": ">=10.0.0"
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
   },
   "packageManager": "pnpm@12.16.1",
   "scripts": {
@@ -27,11 +27,12 @@
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.66.0",
-    "next": "16.4.3",
+    "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "resend": "6.37.0",
     "server-only": "0.0.1",
+    "svix": "^2.9.1",
     "tailwind-merge": "3.7.0",
     "zod": "4.6.7"
   },
@@ -44,7 +45,7 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "4.7.0",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.4.3",
+    "eslint-config-next": "16.4.6",
     "jsdom": "26.1.0",
     "prettier": "3.9.10",
     "supabase": "2.122.0",

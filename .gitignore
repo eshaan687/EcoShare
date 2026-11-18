@@ -11,8 +11,9 @@
 /blob-report
 /playwright/.cache
 
-# Next.js build output
+# Next.js build output & worktrees
 /.next/
+/.worktrees/
 /out/
 /build
 

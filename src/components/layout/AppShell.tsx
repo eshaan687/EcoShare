@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { PrototypeBanner } from "@/components/branding/PrototypeBanner";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
 import { MobileBottomNavigation } from "@/components/layout/MobileBottomNavigation";
 import { MobileHeader } from "@/components/layout/MobileHeader";
@@ -38,7 +37,6 @@ export function AppShell({ children }: AppShellProps) {
         {/* Central Content + Right Contextual Column */}
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <TopNavigation />
-          <PrototypeBanner />
 
           <div className="flex min-w-0 flex-1 gap-5">
             <main

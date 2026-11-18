@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { Avatar } from "@/components/ui/Avatar";
 import { EcoShareLogo } from "@/components/branding/EcoShareLogo";
 import { PrototypeBanner } from "@/components/branding/PrototypeBanner";
 import { FeedTabs } from "@/components/feed/FeedTabs";
@@ -131,5 +132,19 @@ describe("Milestone 1 UI Foundation components and prototype boundaries", () => 
     const approveButton = screen.getByRole("button", { name: /Approve/i });
     fireEvent.click(approveButton);
     expect(screen.getByText("Preview: Approved")).toBeTruthy();
+  });
+
+  it("renders Avatar with remote Clerk image src correctly", () => {
+    render(
+      <Avatar
+        src="https://img.clerk.com/eyJhbGciOiJSUzI1NiIsImtpZCI6InByb3ZpZGVyX2NhY2hlXzEifQ.image.png"
+        name="Clerk Test User"
+        size="md"
+      />,
+    );
+
+    const img = screen.getByRole("img", { name: "Clerk Test User" });
+    expect(img).toBeTruthy();
+    expect(img.getAttribute("src")).toContain("img.clerk.com");
   });
 });

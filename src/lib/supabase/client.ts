@@ -6,6 +6,7 @@ import {
   type SupabaseClient,
 } from "@supabase/supabase-js";
 import { useMemo } from "react";
+import { useSafeAuth } from "@/lib/auth/clerk-hooks";
 import { isSupabaseClientConfigured, parseClientEnv } from "@/lib/env.client";
 import type { Database } from "@/types/database.types";
 
@@ -22,13 +23,16 @@ export function createClient(
 
   if (!isSupabaseClientConfigured(env)) {
     throw new Error(
-      "Supabase browser client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local.",
+      "Supabase browser client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local.",
     );
   }
 
+  const publishableKey =
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   return createSupabaseClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    publishableKey,
     {
       async accessToken() {
         if (!getAccessToken) {
@@ -51,4 +55,25 @@ export function useSupabaseBrowserClient(): SupabaseClient<Database> {
     () => createClient(async () => session?.getToken() ?? null),
     [session],
   );
+}
+
+/**
+ * Safe hook returning a browser Supabase client when configured, or null in
+ * unconfigured test/preview environments. Never throws if ClerkProvider is unmounted.
+ */
+export function useSafeSupabaseClient(): SupabaseClient<Database> | null {
+  const { getToken, isSignedIn } = useSafeAuth();
+
+  return useMemo(() => {
+    const env = parseClientEnv();
+    if (!isSupabaseClientConfigured(env)) {
+      return null;
+    }
+    return createClient(async () => {
+      if (!isSignedIn) {
+        return null;
+      }
+      return getToken();
+    });
+  }, [getToken, isSignedIn]);
 }

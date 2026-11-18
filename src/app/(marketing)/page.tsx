@@ -18,8 +18,67 @@ import { VerificationBadge } from "@/components/impact/VerificationBadge";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { ECOSHARE_LEVELS } from "@/lib/constants/levels";
+import { isClerkClientConfigured } from "@/lib/env.client";
+
+function ClerkMarketingAuth() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="h-9 w-24 animate-pulse rounded-full bg-border/60"
+          aria-hidden="true"
+        />
+      }
+    >
+      <Show when="signed-in">
+        <Link
+          href="/home"
+          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-semibold text-white hover:bg-primary-dark"
+        >
+          Open Feed
+        </Link>
+        <UserButton />
+      </Show>
+      <Show when="signed-out">
+        <Link
+          href="/login"
+          className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-4 text-xs font-semibold text-foreground hover:bg-background"
+        >
+          Log In
+        </Link>
+        <Link
+          href="/signup"
+          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-semibold text-white hover:bg-primary-dark"
+        >
+          Get Started
+        </Link>
+      </Show>
+    </Suspense>
+  );
+}
+
+function GuestMarketingAuth() {
+  return (
+    <>
+      <Link
+        href="/login"
+        className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-4 text-xs font-semibold text-foreground hover:bg-background"
+      >
+        Log In
+      </Link>
+      <Link
+        href="/signup"
+        className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-semibold text-white hover:bg-primary-dark"
+      >
+        Get Started
+      </Link>
+    </>
+  );
+}
 
 export default function WelcomeOnboardingPage() {
+  const clerkConfigured = isClerkClientConfigured();
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Marketing Header */}
@@ -52,38 +111,7 @@ export default function WelcomeOnboardingPage() {
           </nav>
 
           <div className="flex items-center gap-2.5">
-            <Suspense
-              fallback={
-                <div
-                  className="h-9 w-24 animate-pulse rounded-full bg-border/60"
-                  aria-hidden="true"
-                />
-              }
-            >
-              <Show when="signed-in">
-                <Link
-                  href="/home"
-                  className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-semibold text-white hover:bg-primary-dark"
-                >
-                  Open Feed
-                </Link>
-                <UserButton />
-              </Show>
-              <Show when="signed-out">
-                <Link
-                  href="/login"
-                  className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-4 text-xs font-semibold text-foreground hover:bg-background"
-                >
-                  Log In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-semibold text-white hover:bg-primary-dark"
-                >
-                  Get Started
-                </Link>
-              </Show>
-            </Suspense>
+            {clerkConfigured ? <ClerkMarketingAuth /> : <GuestMarketingAuth />}
           </div>
         </div>
       </header>

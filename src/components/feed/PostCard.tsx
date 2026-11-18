@@ -1,5 +1,8 @@
-import { MoreHorizontal } from "lucide-react";
+"use client";
+
+import { MoreHorizontal, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { PostActions } from "@/components/feed/PostActions";
 import { PostMedia } from "@/components/feed/PostMedia";
@@ -7,8 +10,14 @@ import { VerificationBadge } from "@/components/impact/VerificationBadge";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { useSafeUser } from "@/lib/auth/clerk-hooks";
 import type { PrototypePost } from "@/lib/mock/prototype-data";
+import { dispatchPostCreatedEvent } from "@/lib/realtime/use-realtime-feed";
+import { useSafeSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface PostCardProps {
   readonly post: PrototypePost;
@@ -17,9 +26,41 @@ export interface PostCardProps {
 
 /**
  * Matches Sofia M.'s environmental feed post card in references/ecoshare-ui-reference.png.
- * Preserves the distinction between ordinary social posts and human-verified impact posts.
+ * Preserves the distinction between ordinary social posts and human-verified impact posts,
+ * and allows post authors to delete their own posts in Supabase.
  */
 export function PostCard({ post, className }: PostCardProps) {
+  const supabase = useSafeSupabaseClient();
+  const { user, isSignedIn } = useSafeUser();
+  const [deleted, setDeleted] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const isOwnPost = Boolean(
+    isSignedIn && user?.id && post.author.id === user.id,
+  );
+
+  async function handleDeletePost() {
+    if (!isOwnPost || deleting) return;
+    setDeleting(true);
+    try {
+      setDeleted(true);
+      if (supabase && UUID_REGEX.test(post.id)) {
+        await supabase
+          .from("posts")
+          .delete()
+          .eq("id", post.id)
+          .eq("author_id", user!.id);
+        dispatchPostCreatedEvent();
+      }
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  if (deleted) {
+    return null;
+  }
+
   return (
     <Card as="article" className={cn("p-5 space-y-3.5 shadow-xs", className)}>
       {/* Author Header */}
@@ -67,12 +108,25 @@ export function PostCard({ post, className }: PostCardProps) {
               Community Discussion
             </Badge>
           )}
-          <span
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground"
-            aria-hidden="true"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </span>
+          {isOwnPost ? (
+            <button
+              type="button"
+              disabled={deleting}
+              onClick={() => void handleDeletePost()}
+              aria-label="Delete your post"
+              title="Delete your post"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-error/10 hover:text-error cursor-pointer"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+            </button>
+          ) : (
+            <span
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground"
+              aria-hidden="true"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </span>
+          )}
         </div>
       </div>
 

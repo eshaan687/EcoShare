@@ -53,6 +53,9 @@ export interface PrototypeCommunity {
   readonly name: string;
   readonly description: string;
   readonly category: string;
+  readonly country?: string;
+  readonly city?: string;
+  readonly campaignGoal?: string;
   readonly membersCount: number;
   readonly visibility: "public" | "private";
   readonly bannerSrc: string;
@@ -71,6 +74,7 @@ export interface PrototypeBadgeItem {
 
 export interface PrototypeProfileSummary {
   readonly isPrototype: true;
+  readonly userId?: string;
   readonly username: string;
   readonly displayName: string;
   readonly bio: string;
@@ -94,9 +98,11 @@ export interface PrototypeVerificationReviewItem {
   readonly submitterHandle: string;
   readonly submittedRelative: string;
   readonly activityTitle: string;
+  readonly description?: string;
   readonly category: string;
   readonly location: string;
   readonly thumbnailSrc: string;
+  readonly rewardXp?: number;
   readonly status: "pending" | "approved" | "rejected";
 }
 
@@ -363,37 +369,88 @@ export const PROTOTYPE_CHALLENGES: readonly PrototypeChallenge[] = [
 
 export const PROTOTYPE_COMMUNITIES: readonly PrototypeCommunity[] = [
   {
-    id: "community-beach-cleanup",
+    id: "33333333-3333-4333-8333-333333333301",
     isPrototype: true,
     slug: "beach-cleanup-volunteers",
     name: "Beach Cleanup Volunteers",
     description: "Coordinating coastal cleanups, marine debris tracking, and shoreline protection.",
     category: "Ocean Conservation",
+    country: "United States",
+    city: "San Diego, CA",
+    campaignGoal: "Remove 5,000 kg of coastal marine plastic this season",
     membersCount: 14820,
     visibility: "public",
     bannerSrc: "/images/challenge-oceans.png",
   },
   {
-    id: "community-urban-gardening",
+    id: "33333333-3333-4333-8333-333333333302",
     isPrototype: true,
     slug: "urban-gardening-collective",
     name: "Urban Gardening & Reforestation",
     description: "Transforming city rooftops, schoolyards, and parks with native trees and pollinator gardens.",
     category: "Tree Planting",
+    country: "Canada",
+    city: "Vancouver, BC",
+    campaignGoal: "Plant 10,000 native saplings across urban corridors",
     membersCount: 9640,
     visibility: "public",
     bannerSrc: "/images/challenge-trees.png",
   },
   {
-    id: "community-recycling-initiatives",
+    id: "33333333-3333-4333-8333-333333333303",
     isPrototype: true,
     slug: "community-recycling-network",
     name: "Zero-Waste & Recycling Advocates",
     description: "Practical community recycling drives, repair cafes, and local waste-reduction education.",
     category: "Recycling Initiatives",
+    country: "Mexico",
+    city: "Monterrey, NL",
+    campaignGoal: "Divert 20 tons of single-use plastic from municipal landfills",
     membersCount: 7210,
     visibility: "public",
     bannerSrc: "/images/cleanup-park.png",
+  },
+  {
+    id: "33333333-3333-4333-8333-333333333304",
+    isPrototype: true,
+    slug: "atlantic-coastal-stewards-portugal",
+    name: "Atlantic Coastal Stewards",
+    description: "Protecting Atlantic beaches, dune ecosystems, and coastal marine habitats across Portugal.",
+    category: "Ocean Conservation",
+    country: "Portugal",
+    city: "Lisbon",
+    campaignGoal: "Restore 15 km of coastal dune habitats and clean 30 beaches",
+    membersCount: 4180,
+    visibility: "public",
+    bannerSrc: "/images/challenge-oceans.png",
+  },
+  {
+    id: "33333333-3333-4333-8333-333333333305",
+    isPrototype: true,
+    slug: "green-india-reforestation-campaign",
+    name: "Green India Monsoon Plantation Drive",
+    description: "Community-led monsoon tree planting, watershed restoration, and urban biodiversity parks.",
+    category: "Tree Planting",
+    country: "India",
+    city: "Bengaluru",
+    campaignGoal: "Plant 50,000 native trees during the monsoon season",
+    membersCount: 11350,
+    visibility: "public",
+    bannerSrc: "/images/challenge-trees.png",
+  },
+  {
+    id: "33333333-3333-4333-8333-333333333306",
+    isPrototype: true,
+    slug: "global-pollinator-corridor-alliance",
+    name: "Global Pollinator Corridor Alliance",
+    description: "Worldwide network creating pesticide-free wildflower micro-meadows for native bees and butterflies.",
+    category: "Wildlife Conservation",
+    country: "Global",
+    city: "Worldwide",
+    campaignGoal: "Establish 1,000 verified pollinator micro-habitats globally",
+    membersCount: 6490,
+    visibility: "public",
+    bannerSrc: "/images/wildlife-pollinator.png",
   },
 ];
 

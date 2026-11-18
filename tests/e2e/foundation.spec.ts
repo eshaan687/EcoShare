@@ -89,19 +89,38 @@ test.describe("Milestone 1 UI Foundation & Responsive Verification", () => {
     }
 
     // Switch to "Verified Impact" tab and verify non-verified discussion post is filtered out
-    await page.getByRole("tab", { name: /Verified Impact/i }).click();
+    const verifiedTab = page.getByRole("tab", { name: /Verified Impact/i });
+    await expect(verifiedTab).toBeVisible();
+    await expect(async () => {
+      await verifiedTab.click();
+      await expect(verifiedTab).toHaveAttribute("aria-selected", "true", {
+        timeout: 1500,
+      });
+    }).toPass({ timeout: 10000 });
+
     await expect(page.getByText("Sofia M.")).toBeVisible();
     await expect(page.getByText("Elena K.")).toHaveCount(0);
 
     // Switch back to "For You"
-    await page.getByRole("tab", { name: "For You" }).click();
+    const forYouTab = page.getByRole("tab", { name: "For You" });
+    await expect(async () => {
+      await forYouTab.click();
+      await expect(forYouTab).toHaveAttribute("aria-selected", "true", {
+        timeout: 1500,
+      });
+    }).toPass({ timeout: 10000 });
+
     await expect(page.getByText("Elena K.")).toBeVisible();
 
     // Open "Share Your Action" dialog and verify guest sign-in prompt & submission modes
-    await page.getByRole("button", { name: "Share Your Action" }).click();
-    await expect(
-      page.getByRole("dialog", { name: "Share an Environmental Action" }),
-    ).toBeVisible();
+    const shareActionBtn = page.getByRole("button", { name: "Share Your Action" });
+    await expect(async () => {
+      await shareActionBtn.click();
+      await expect(
+        page.getByRole("dialog", { name: "Share an Environmental Action" }),
+      ).toBeVisible({ timeout: 1500 });
+    }).toPass({ timeout: 10000 });
+
     await expect(page.getByText(/Guest Preview Mode/i)).toBeVisible();
 
     if (testInfo.project.name === "desktop-1440") {

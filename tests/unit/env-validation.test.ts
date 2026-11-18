@@ -35,6 +35,23 @@ describe("EcoShare Clerk + Supabase environment validation", () => {
     expect(isSupabaseClientConfigured(env)).toBe(true);
   });
 
+  it("validates standardized NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY and aliases anon key", () => {
+    const env = parseClientEnv({
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_standard",
+      NEXT_PUBLIC_SUPABASE_URL: "https://standard.supabase.co",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_key_standard",
+    });
+
+    expect(isSupabaseClientConfigured(env)).toBe(true);
+    expect(env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).toBe(
+      "sb_publishable_key_standard",
+    );
+    expect(env.NEXT_PUBLIC_SUPABASE_ANON_KEY).toBe(
+      "sb_publishable_key_standard",
+    );
+  });
+
   it("rejects malformed NEXT_PUBLIC_SUPABASE_URL", () => {
     expect(() =>
       parseClientEnv({

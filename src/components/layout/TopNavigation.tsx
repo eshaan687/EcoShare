@@ -4,45 +4,160 @@ import { Show, UserButton, useUser } from "@clerk/nextjs";
 import { Bell, ChevronDown, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { CreateActionDialog } from "@/components/impact/CreateActionDialog";
 import { Avatar } from "@/components/ui/Avatar";
-import { PROTOTYPE_USER_PROFILE } from "@/lib/mock/prototype-data";
+import { isClerkClientConfigured } from "@/lib/env.client";
+import { useSafeSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 export interface TopNavigationProps {
   readonly className?: string;
 }
 
-/**
- * Matches the top search and utility bar in references/ecoshare-ui-reference.png:
- * rounded search input ("Search EcoShare..."), circular green "+" create button,
- * notifications bell, profile avatar shortcut, and Clerk authentication controls.
- */
-export function TopNavigation({ className }: TopNavigationProps) {
-  const router = useRouter();
+function ClerkAuthControls() {
   const { isSignedIn, user } = useUser();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [createOpen, setCreateOpen] = useState(false);
 
   const displayName =
     isSignedIn && user
       ? user.fullName ||
         user.username ||
         user.primaryEmailAddress?.emailAddress ||
-        PROTOTYPE_USER_PROFILE.displayName
-      : PROTOTYPE_USER_PROFILE.displayName;
+        "EcoShare Member"
+      : "Guest";
 
-  const avatarSrc =
-    isSignedIn && user?.imageUrl
-      ? user.imageUrl
-      : PROTOTYPE_USER_PROFILE.avatarSrc;
+  const avatarSrc = isSignedIn && user?.imageUrl ? user.imageUrl : undefined;
+
+  return (
+    <>
+      <Link
+        href="/profile"
+        aria-label="View EcoShare profile"
+        className="inline-flex items-center gap-1 rounded-full pr-1 transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      >
+        <Avatar
+          src={avatarSrc}
+          alt={displayName}
+          size="sm"
+          className="h-9 w-9 border border-border"
+        />
+        <ChevronDown
+          className="h-3.5 w-3.5 text-muted-foreground"
+          aria-hidden="true"
+        />
+      </Link>
+
+      <Suspense
+        fallback={
+          <div
+            className="h-8 w-20 animate-pulse rounded-full bg-border/60"
+            aria-hidden="true"
+          />
+        }
+      >
+        <Show when="signed-in">
+          <UserButton />
+        </Show>
+        <Show when="signed-out">
+          <div className="flex items-center gap-2 pl-1">
+            <Link
+              href="/login"
+              className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className="hidden lg:inline-flex h-9 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            >
+              Get Started
+            </Link>
+          </div>
+        </Show>
+      </Suspense>
+    </>
+  );
+}
+
+function GuestAuthControls() {
+  return (
+    <>
+      <Link
+        href="/profile"
+        aria-label="View EcoShare profile"
+        className="inline-flex items-center gap-1 rounded-full pr-1 transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      >
+        <Avatar
+          alt="Guest"
+          size="sm"
+          className="h-9 w-9 border border-border"
+        />
+        <ChevronDown
+          className="h-3.5 w-3.5 text-muted-foreground"
+          aria-hidden="true"
+        />
+      </Link>
+
+      <div className="flex items-center gap-2 pl-1">
+        <Link
+          href="/login"
+          className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        >
+          Log In
+        </Link>
+        <Link
+          href="/signup"
+          className="hidden lg:inline-flex h-9 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        >
+          Get Started
+        </Link>
+      </div>
+    </>
+  );
+}
+
+/**
+ * Matches the top search and utility bar in references/ecoshare-ui-reference.png:
+ * rounded search input ("Search EcoShare..."), circular green "+" create button,
+ * notifications bell with live unread badge, profile avatar shortcut, and Clerk authentication controls.
+ */
+export function TopNavigation({ className }: TopNavigationProps) {
+  const router = useRouter();
+  const supabase = useSafeSupabaseClient();
+  const { user, isSignedIn } = useUser();
+  const userId = user?.id ?? null;
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const clerkConfigured = isClerkClientConfigured();
+
+  useEffect(() => {
+    if (!supabase || !isSignedIn || !userId) return;
+    let cancelled = false;
+
+    async function loadUnread() {
+      const { count } = await supabase!
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_id", userId!)
+        .eq("is_read", false);
+      if (!cancelled) {
+        setUnreadCount(count ?? 0);
+      }
+    }
+
+    void Promise.resolve().then(() => loadUnread());
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, isSignedIn, userId]);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = searchQuery.trim();
-    if (trimmed.length > 0) {
+    if (trimmed) {
       router.push(`/explore?q=${encodeURIComponent(trimmed)}`);
     } else {
       router.push("/explore");
@@ -59,13 +174,12 @@ export function TopNavigation({ className }: TopNavigationProps) {
         )}
       >
         <form
-          onSubmit={handleSearchSubmit}
           role="search"
-          aria-label="Search EcoShare"
-          className="relative min-w-0 flex-1 max-w-md"
+          onSubmit={handleSearchSubmit}
+          className="relative flex-1 max-w-md"
         >
           <Search
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
           />
           <input
@@ -91,63 +205,25 @@ export function TopNavigation({ className }: TopNavigationProps) {
 
           <Link
             href="/notifications"
-            aria-label="Notifications (3 sample items)"
+            aria-label={
+              unreadCount > 0
+                ? `Notifications (${unreadCount} unread)`
+                : "Notifications"
+            }
             className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-background hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             <Bell className="h-5 w-5" aria-hidden="true" />
-            <span
-              className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white"
-              aria-hidden="true"
-            >
-              3
-            </span>
-          </Link>
-
-          <Link
-            href="/profile"
-            aria-label="View EcoShare profile"
-            className="inline-flex items-center gap-1 rounded-full pr-1 transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-          >
-            <Avatar
-              src={avatarSrc}
-              alt={displayName}
-              size="sm"
-              className="h-9 w-9 border border-border"
-            />
-            <ChevronDown
-              className="h-3.5 w-3.5 text-muted-foreground"
-              aria-hidden="true"
-            />
-          </Link>
-
-          <Suspense
-            fallback={
-              <div
-                className="h-8 w-20 animate-pulse rounded-full bg-border/60"
+            {unreadCount > 0 ? (
+              <span
+                className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white"
                 aria-hidden="true"
-              />
-            }
-          >
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-            <Show when="signed-out">
-              <div className="flex items-center gap-2 pl-1">
-                <Link
-                  href="/login"
-                  className="inline-flex h-9 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-background outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                >
-                  Log In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="hidden lg:inline-flex h-9 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-white transition-colors hover:bg-primary-dark outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                >
-                  Get Started
-                </Link>
-              </div>
-            </Show>
-          </Suspense>
+              >
+                {unreadCount}
+              </span>
+            ) : null}
+          </Link>
+
+          {clerkConfigured ? <ClerkAuthControls /> : <GuestAuthControls />}
         </div>
       </header>
 

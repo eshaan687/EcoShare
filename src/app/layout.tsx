@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const env = parseClientEnv();
-  const clerkReady = isClerkClientConfigured(env);
+  const clerkConfigured = isClerkClientConfigured(env);
 
   const content = (
     <>
@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background text-text-primary antialiased">
-        {clerkReady ? (
+        {clerkConfigured ? (
           <ClerkProvider
             publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
             signInUrl="/login"
